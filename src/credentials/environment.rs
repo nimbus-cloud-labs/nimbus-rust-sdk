@@ -28,16 +28,11 @@ pub struct EnvironmentCredentialProvider {
     source: EnvSource,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 enum EnvSource {
+    #[default]
     Real,
     Snapshot(Arc<HashMap<String, String>>),
-}
-
-impl Default for EnvSource {
-    fn default() -> Self {
-        EnvSource::Real
-    }
 }
 
 impl EnvSource {
@@ -99,24 +94,10 @@ impl EnvironmentCredentialProvider {
     }
 
     fn load_scope(&self, scope: Scope<'_>) -> Result<Credentials, AuthError> {
-        let access_key_name = scope.key(ACCESS_KEY);
-        let secret_key_name = scope.key(SECRET_KEY);
-        let region_key_name = scope.key(REGION_KEY);
-        let session_key_name = scope.key(SESSION_TOKEN_KEY);
-
-        let access_key = self.read_required(&access_key_name, validate_access_key)?;
-        let secret_key = self.read_required(&secret_key_name, validate_secret_key)?;
-        let region = self.read_required(&region_key_name, validate_region)?;
-        let session_token = self
-            .source
-            .get(&session_key_name)
-            .map(|value| value.trim().to_string())
-            .filter(|value| !value.is_empty())
-            .map(|value| {
-                self.validate_session_token(&session_key_name, &value)
-                    .map(|_| value)
-            })
-            .transpose()?;
+        let access_key = self.read_required(scope, ACCESS_KEY, validate_access_key)?;
+        let secret_key = self.read_required(scope, SECRET_KEY, validate_secret_key)?;
+        let region = self.read_required(scope, REGION_KEY, validate_region)?;
+        let session_token = self.read_optional_session_token(scope)?;
 
         debug!(
             target: "nimbus_sdk::auth",
@@ -135,49 +116,89 @@ impl EnvironmentCredentialProvider {
         })
     }
 
-    fn read_required<F>(&self, key: &str, validate: F) -> Result<String, AuthError>
+    fn read_required<F>(
+        &self,
+        scope: Scope<'_>,
+        suffix: &str,
+        validate: F,
+    ) -> Result<String, AuthError>
     where
         F: Fn(&str) -> Result<(), &'static str>,
     {
-        match self.source.get(key) {
-            Some(value) => {
-                let trimmed = value.trim().to_string();
-                if trimmed.is_empty() {
-                    warn!(
-                        target: "nimbus_sdk::auth",
-                        key = %key,
-                        "environment variable is set but empty"
-                    );
-                    return Err(AuthError::InvalidEnvVar {
-                        key: key.to_string(),
-                        reason: "value must not be empty".to_string(),
-                    });
-                }
-                validate(&trimmed).map_err(|reason| {
-                    warn!(
-                        target: "nimbus_sdk::auth",
-                        key = %key,
-                        reason = %reason,
-                        "environment variable failed validation"
-                    );
-                    AuthError::InvalidEnvVar {
-                        key: key.to_string(),
-                        reason: reason.to_string(),
+        let candidates = scope.candidate_keys(suffix);
+        for (index, key) in candidates.iter().enumerate() {
+            match self.source.get(key) {
+                Some(value) => {
+                    let trimmed = value.trim().to_string();
+                    if trimmed.is_empty() {
+                        warn!(
+                            target: "nimbus_sdk::auth",
+                            key = %key,
+                            "environment variable is set but empty"
+                        );
+                        return Err(AuthError::InvalidEnvVar {
+                            key: key.to_string(),
+                            reason: "value must not be empty".to_string(),
+                        });
                     }
-                })?;
-                Ok(trimmed)
-            }
-            None => {
-                warn!(
-                    target: "nimbus_sdk::auth",
-                    key = %key,
-                    "required environment variable missing"
-                );
-                Err(AuthError::MissingEnvVar {
-                    key: key.to_string(),
-                })
+                    validate(&trimmed).map_err(|reason| {
+                        warn!(
+                            target: "nimbus_sdk::auth",
+                            key = %key,
+                            reason = %reason,
+                            "environment variable failed validation"
+                        );
+                        AuthError::InvalidEnvVar {
+                            key: key.to_string(),
+                            reason: reason.to_string(),
+                        }
+                    })?;
+                    if index > 0 {
+                        debug!(
+                            target: "nimbus_sdk::auth",
+                            key = %key,
+                            "falling back to global credential"
+                        );
+                    }
+                    return Ok(trimmed);
+                }
+                None => continue,
             }
         }
+
+        warn!(
+            target: "nimbus_sdk::auth",
+            keys = %candidates.join(", "),
+            "required environment variable missing"
+        );
+        Err(AuthError::MissingEnvVar {
+            key: candidates
+                .first()
+                .cloned()
+                .unwrap_or_else(|| format!("{GLOBAL_PREFIX}_{suffix}")),
+        })
+    }
+
+    fn read_optional_session_token(&self, scope: Scope<'_>) -> Result<Option<String>, AuthError> {
+        let candidates = scope.candidate_keys(SESSION_TOKEN_KEY);
+        for (index, key) in candidates.iter().enumerate() {
+            if let Some(value) = self.source.get(key) {
+                let trimmed = value.trim().to_string();
+                if trimmed.is_empty() {
+                    continue;
+                }
+                self.validate_session_token(key, &trimmed)?;
+                if index > 0 {
+                    debug!(
+                        target: "nimbus_sdk::auth",
+                        key = %key,
+                        "falling back to global session token"
+                    );
+                }
+                return Ok(Some(trimmed));
+            }
+        }
+        Ok(None)
     }
 
     fn validate_session_token(&self, key: &str, value: &str) -> Result<(), AuthError> {
@@ -253,16 +274,20 @@ impl Credentials {
     }
 }
 
+#[derive(Clone, Copy)]
 enum Scope<'a> {
     Profile(&'a str),
     Global,
 }
 
 impl<'a> Scope<'a> {
-    fn key(&self, suffix: &str) -> String {
+    fn candidate_keys(&self, suffix: &str) -> Vec<String> {
         match self {
-            Scope::Profile(name) => format!("{PROFILE_PREFIX}_{name}_{suffix}"),
-            Scope::Global => format!("{GLOBAL_PREFIX}_{suffix}"),
+            Scope::Profile(name) => vec![
+                format!("{PROFILE_PREFIX}_{name}_{suffix}"),
+                format!("{GLOBAL_PREFIX}_{suffix}"),
+            ],
+            Scope::Global => vec![format!("{GLOBAL_PREFIX}_{suffix}")],
         }
     }
 }

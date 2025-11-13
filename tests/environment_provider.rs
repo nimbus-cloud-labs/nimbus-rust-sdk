@@ -47,6 +47,23 @@ mod enabled {
     }
 
     #[tokio::test]
+    async fn falls_back_to_global_variables_when_profile_missing() {
+        let provider = EnvironmentCredentialProvider::from_snapshot(vec![
+            ("NIMBUS_PROFILE".to_string(), "analytics".to_string()),
+            ("NIMBUS_ACCESS_KEY".to_string(), ACCESS_KEY.to_string()),
+            ("NIMBUS_SECRET_KEY".to_string(), SECRET_KEY.to_string()),
+            ("NIMBUS_REGION".to_string(), REGION.to_string()),
+        ]);
+
+        let header = provider.authorization_header().await.unwrap();
+        let expected = format!(
+            "Basic {}",
+            STANDARD.encode(format!("{ACCESS_KEY}:{SECRET_KEY}"))
+        );
+        assert_eq!(header, expected);
+    }
+
+    #[tokio::test]
     async fn falls_back_to_basic_auth_without_session_token() {
         let provider = EnvironmentCredentialProvider::from_snapshot(vec![
             ("NIMBUS_ACCESS_KEY".to_string(), ACCESS_KEY.to_string()),
