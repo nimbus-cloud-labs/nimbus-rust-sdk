@@ -9,3 +9,8 @@ license = "Apache-2.0"
 nimbus-sdk-core = { path = ".." }
 serde = { workspace = true }
 serde_json = { workspace = true }
+
+bytes = { version = "1" }
+hex = { version = "0.4" }
+reqwest = { workspace = true }
+sha2 = { version = "0.10" }
