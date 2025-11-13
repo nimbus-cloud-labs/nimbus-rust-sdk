@@ -1,0 +1,11 @@
+[package]
+name = "nimbus-sdk-dam"
+version = "0.1.0"
+edition = "2021"
+description = "Nimbus dam Rust SDK"
+license = "Apache-2.0"
+
+[dependencies]
+nimbus-sdk-core = { path = ".." }
+serde = { workspace = true }
+serde_json = { workspace = true }

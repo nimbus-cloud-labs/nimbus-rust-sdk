@@ -1,0 +1,31 @@
+//! Generated types – do not edit by hand.
+use serde_json::Value;
+
+pub type AccountRegistrationPayload = Value;
+pub type AssumeRoleRequest = Value;
+pub type ConsoleSessionStartRequest = Value;
+pub type ConsoleSessionStartRequestScopeList = Value;
+pub type CreatePolicy = Value;
+pub type CreatePolicyStatementsList = Value;
+pub type GroupMembershipPayload = Value;
+pub type GroupPayload = Value;
+pub type Policy = Value;
+pub type PolicyAttachmentPayload = Value;
+pub type Principal = Value;
+pub type RevokeTokenRequest = Value;
+pub type Statement = Value;
+pub type StatementActionList = Value;
+pub type StatementConditionMap = Value;
+pub type StatementResourceList = Value;
+pub type TenantPayload = Value;
+pub type TokenRequest = Value;
+pub type TokenRequestScopeList = Value;
+pub type TokenResponse = Value;
+pub type UpdatePolicy = Value;
+pub type UpdatePolicyStatementsList = Value;
+pub type UserMfaRequirementPayload = Value;
+pub type UserPayload = Value;
+pub type ValidateHmacHeader = Value;
+pub type ValidateHmacRequest = Value;
+pub type ValidateHmacRequestHeadersList = Value;
+pub type ValidateJwtRequest = Value;
