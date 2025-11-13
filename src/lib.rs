@@ -4,13 +4,18 @@
 
 pub mod auth;
 pub mod client;
+#[cfg(feature = "env-provider")]
+pub mod credentials;
 pub mod error;
 pub mod idempotency;
 pub mod lro;
 pub mod paginator;
 pub mod transport;
 
-pub use auth::{AuthError, AuthTokenProvider, StaticTokenProvider};
+pub use auth::{
+    default_chain as default_auth_chain, AuthError, AuthProviderChain, AuthTokenProvider,
+    StaticTokenProvider,
+};
 pub use client::{
     AdditionalSuccessResponseSpec, BuildError, NimbusClient, OperationResult, OperationSpec,
     PaginationSpec, SdkConfig, SdkConfigBuilder,

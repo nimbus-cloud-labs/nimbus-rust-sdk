@@ -5,8 +5,13 @@ edition = "2021"
 description = "Nimbus Rust SDK core runtime"
 license = "Apache-2.0"
 
+[features]
+default = ["env-provider"]
+env-provider = []
+
 [dependencies]
 async-trait = { workspace = true }
+base64 = { version = "0.22" }
 http = { version = "1" }
 once_cell = { version = "1" }
 reqwest = { workspace = true }
