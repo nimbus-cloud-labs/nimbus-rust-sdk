@@ -3,7 +3,9 @@
 
 use crate::types::*;
 use nimbus_sdk_core::{
-    client::{NimbusClient, OperationSpec, PaginationSpec, SdkConfig},
+    client::{
+        AdditionalSuccessResponseSpec, NimbusClient, OperationSpec, PaginationSpec, SdkConfig,
+    },
     error::SdkError,
     lro::LroWaiter,
     paginator::Paginator,
@@ -96,6 +98,7 @@ const GET_HEALTH_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Get,
     uri: "/healthz",
     success_code: 200,
+    additional_success_responses: &[],
     idempotent: false,
     pagination: None,
     lro: false,
@@ -106,6 +109,7 @@ const GET_METRICS_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Get,
     uri: "/metrics",
     success_code: 200,
+    additional_success_responses: &[],
     idempotent: false,
     pagination: None,
     lro: false,
@@ -116,6 +120,10 @@ const LIST_LISTENERS_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Get,
     uri: "/listeners",
     success_code: 200,
+    additional_success_responses: &[AdditionalSuccessResponseSpec {
+        code: 206,
+        has_body: true,
+    }],
     idempotent: false,
     pagination: Some(PaginationSpec {
         request_header: "Range",
@@ -129,6 +137,7 @@ const RELOAD_LISTENERS_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Post,
     uri: "/listeners/reload",
     success_code: 200,
+    additional_success_responses: &[],
     idempotent: false,
     pagination: None,
     lro: false,
@@ -139,6 +148,7 @@ const SCHEDULE_SYNC_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Post,
     uri: "/listeners/sync",
     success_code: 202,
+    additional_success_responses: &[],
     idempotent: false,
     pagination: None,
     lro: true,

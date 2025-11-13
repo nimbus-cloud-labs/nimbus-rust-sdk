@@ -12,8 +12,8 @@ pub mod transport;
 
 pub use auth::{AuthError, AuthTokenProvider, StaticTokenProvider};
 pub use client::{
-    BuildError, NimbusClient, OperationResult, OperationSpec, PaginationSpec, SdkConfig,
-    SdkConfigBuilder,
+    AdditionalSuccessResponseSpec, BuildError, NimbusClient, OperationResult, OperationSpec,
+    PaginationSpec, SdkConfig, SdkConfigBuilder,
 };
 pub use error::SdkError;
 pub use idempotency::{default_provider as default_idempotency_provider, IdempotencyTokenProvider};

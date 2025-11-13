@@ -31,9 +31,16 @@ pub struct OperationSpec {
     pub method: SdkHttpMethod,
     pub uri: &'static str,
     pub success_code: u16,
+    pub additional_success_responses: &'static [AdditionalSuccessResponseSpec],
     pub idempotent: bool,
     pub pagination: Option<PaginationSpec>,
     pub lro: bool,
+}
+
+#[derive(Clone, Copy)]
+pub struct AdditionalSuccessResponseSpec {
+    pub code: u16,
+    pub has_body: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -196,10 +203,17 @@ impl NimbusClient {
         if status == spec.success_code {
             return true;
         }
+        if spec
+            .additional_success_responses
+            .iter()
+            .any(|response| response.code == status)
+        {
+            return true;
+        }
         if spec.pagination.is_some() && status == 206 {
             return true;
         }
-        spec.success_code == 204 && status == 204
+        false
     }
 }
 
