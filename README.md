@@ -20,3 +20,13 @@ artifacts executed later.
 
 When troubleshooting credential resolution, refer to the
 [glossary troubleshooting notes](../../docs/sdk/glossary.md#troubleshooting).
+
+## Instance metadata credentials
+
+Workloads running on Nimbus compute instances can retrieve rotating credentials
+from the metadata service described in
+[`docs/compute/metadata-service.md`](../../docs/compute/metadata-service.md).
+The document covers the required headers, token time-to-live limits, network
+allowlisting, and the 30 requests per second rate policy enforced by the
+platform. Integrations should reuse the shared HTTP client stack so retries and
+token refresh logic remain consistent across SDK components.
