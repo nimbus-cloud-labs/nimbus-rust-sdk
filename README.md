@@ -20,6 +20,8 @@ artifacts executed later.
 
 When troubleshooting credential resolution, refer to the
 [glossary troubleshooting notes](../../docs/sdk/glossary.md#troubleshooting).
+The [credential provider precedence overview](../../docs/sdk/credential-provider-strategy.md#credential-provider-precedence)
+contains a diagram and comparison tables summarizing provider overrides, caching, and error reporting.
 
 ## Instance metadata credentials
 
