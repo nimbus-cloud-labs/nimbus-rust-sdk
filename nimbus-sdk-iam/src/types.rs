@@ -3,6 +3,7 @@ use serde_json::Value;
 
 pub type AccountRegistrationPayload = Value;
 pub type AssumeRoleRequest = Value;
+pub type ConsoleSessionContextUpdatePayload = Value;
 pub type ConsoleSessionStartRequest = Value;
 pub type ConsoleSessionStartRequestScopeList = Value;
 pub type CreatePolicy = Value;
