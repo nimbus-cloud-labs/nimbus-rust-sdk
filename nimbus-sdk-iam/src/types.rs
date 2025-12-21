@@ -14,6 +14,7 @@ pub type GroupMembershipPayload = Value;
 pub type GroupPayload = Value;
 pub type GroupRoleBindingPayload = Value;
 pub type GroupUpdatePayload = Value;
+pub type ManagedPolicyAttachmentPayload = Value;
 pub type OidcProviderPayload = Value;
 pub type OidcProviderUpdatePayload = Value;
 pub type Policy = Value;
