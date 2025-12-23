@@ -1317,7 +1317,7 @@ const CREATE_POLICY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/policies",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
