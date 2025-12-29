@@ -1262,7 +1262,7 @@ const ADD_USER_TO_GROUP_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/groups/{group_id}/users",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1273,7 +1273,7 @@ const ASSUME_ROLE_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/assume-role",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1284,7 +1284,7 @@ const ATTACH_MANAGED_POLICY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/principals/{type}/{id}/managed-policies",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1295,7 +1295,7 @@ const ATTACH_POLICY_TO_PRINCIPAL_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/principals/{type}/{id}/policies",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1328,7 +1328,7 @@ const CREATE_PRINCIPAL_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/principals",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1361,7 +1361,7 @@ const CREATE_SIGNING_KEY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/signing-keys",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1372,7 +1372,7 @@ const CREATE_TENANT_GROUP_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/groups",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1383,7 +1383,7 @@ const CREATE_TENANT_USER_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/users",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1416,7 +1416,7 @@ const DELETE_POLICY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/policies/{tenant}/{id}",
     success_code: 204,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1460,7 +1460,7 @@ const DETACH_MANAGED_POLICY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/principals/{type}/{id}/managed-policies/{policy_id}",
     success_code: 204,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1471,7 +1471,7 @@ const DETACH_POLICY_FROM_PRINCIPAL_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/principals/{type}/{id}/policies/{policy_id}",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1493,7 +1493,7 @@ const EMIT_TOKEN_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/token",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1900,7 +1900,7 @@ const SET_USER_MFA_REQUIREMENT_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/tenants/{tenant}/users/{user_id}/mfa",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
@@ -1944,7 +1944,7 @@ const UPDATE_POLICY_SPEC: OperationSpec = OperationSpec {
     uri: "/iam/policies/{tenant}/{id}",
     success_code: 200,
     additional_success_responses: &[],
-    idempotent: false,
+    idempotent: true,
     pagination: None,
     lro: false,
 };
