@@ -170,6 +170,25 @@ impl IamClient {
             .deserialize::<ServiceAccountResponse>(result.body)
     }
 
+    /// Creates a new key for a service account.
+    pub async fn create_service_account_key(
+        &self,
+        params: CreateServiceAccountKeyPathParams<'_>,
+        body: &ServiceAccountQuery,
+    ) -> Result<ApiKeyResponse, SdkError> {
+        let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let result = self
+            .inner
+            .invoke(
+                &CREATE_SERVICE_ACCOUNT_KEY_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<ApiKeyResponse>(result.body)
+    }
+
     /// Creates a signing key for a tenant.
     pub async fn create_signing_key(
         &self,
@@ -210,6 +229,20 @@ impl IamClient {
             .await?;
         self.inner
             .deserialize::<UserProvisioningResponse>(result.body)
+    }
+
+    /// Creates a new key for a user.
+    pub async fn create_user_key(
+        &self,
+        params: CreateUserKeyPathParams<'_>,
+        body: &UserKeyQuery,
+    ) -> Result<ApiKeyResponse, SdkError> {
+        let path_params = vec![("user_id", params.user_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&CREATE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<ApiKeyResponse>(result.body)
     }
 
     /// Deletes a group.
@@ -283,6 +316,28 @@ impl IamClient {
             .deserialize::<ServiceAccountResponse>(result.body)
     }
 
+    /// Deletes a service account key.
+    pub async fn delete_service_account_key(
+        &self,
+        params: DeleteServiceAccountKeyPathParams<'_>,
+        body: &ServiceAccountQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("service_account_id", params.service_account_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(
+                &DELETE_SERVICE_ACCOUNT_KEY_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
+    }
+
     /// Deletes a user.
     pub async fn delete_user(
         &self,
@@ -294,6 +349,23 @@ impl IamClient {
             .invoke(&DELETE_USER_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<UserResponse>(result.body)
+    }
+
+    /// Deletes a user key.
+    pub async fn delete_user_key(
+        &self,
+        params: DeleteUserKeyPathParams<'_>,
+        body: &UserKeyQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("user_id", params.user_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(&DELETE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
 
     /// Detaches a managed policy from a principal.
@@ -332,6 +404,28 @@ impl IamClient {
         self.inner.deserialize::<Principal>(result.body)
     }
 
+    /// Disables a service account key.
+    pub async fn disable_service_account_key(
+        &self,
+        params: DisableServiceAccountKeyPathParams<'_>,
+        body: &ServiceAccountQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("service_account_id", params.service_account_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(
+                &DISABLE_SERVICE_ACCOUNT_KEY_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
+    }
+
     /// Disables a user login.
     pub async fn disable_user(
         &self,
@@ -345,6 +439,23 @@ impl IamClient {
         self.inner.deserialize::<UserResponse>(result.body)
     }
 
+    /// Disables a user key.
+    pub async fn disable_user_key(
+        &self,
+        params: DisableUserKeyPathParams<'_>,
+        body: &UserKeyQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("user_id", params.user_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(&DISABLE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
+    }
+
     /// Issues a signed token for the requested principal.
     pub async fn emit_token(&self, body: &TokenRequest) -> Result<TokenResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
@@ -353,6 +464,28 @@ impl IamClient {
             .invoke(&EMIT_TOKEN_SPEC, &path_params, Some(body), None)
             .await?;
         self.inner.deserialize::<TokenResponse>(result.body)
+    }
+
+    /// Enables a service account key.
+    pub async fn enable_service_account_key(
+        &self,
+        params: EnableServiceAccountKeyPathParams<'_>,
+        body: &ServiceAccountQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("service_account_id", params.service_account_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(
+                &ENABLE_SERVICE_ACCOUNT_KEY_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
 
     /// Enables a user login.
@@ -366,6 +499,23 @@ impl IamClient {
             .invoke(&ENABLE_USER_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<UserResponse>(result.body)
+    }
+
+    /// Enables a user key.
+    pub async fn enable_user_key(
+        &self,
+        params: EnableUserKeyPathParams<'_>,
+        body: &UserKeyQuery,
+    ) -> Result<ApiKeyMetadata, SdkError> {
+        let path_params = vec![
+            ("user_id", params.user_id.to_string()),
+            ("key_id", params.key_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(&ENABLE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
 
     /// Exports audit events for the current tenant.
@@ -666,6 +816,25 @@ impl IamClient {
         self.inner.deserialize::<RoleListResponse>(result.body)
     }
 
+    /// Lists keys for a service account.
+    pub async fn list_service_account_keys(
+        &self,
+        params: ListServiceAccountKeysPathParams<'_>,
+        body: &ServiceAccountQuery,
+    ) -> Result<ApiKeyListResponse, SdkError> {
+        let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let result = self
+            .inner
+            .invoke(
+                &LIST_SERVICE_ACCOUNT_KEYS_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<ApiKeyListResponse>(result.body)
+    }
+
     /// Lists service accounts for the current account.
     pub async fn list_service_accounts(
         &self,
@@ -701,6 +870,20 @@ impl IamClient {
             .invoke(&LIST_TENANTS_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<TenantListResponse>(result.body)
+    }
+
+    /// Lists keys for a user.
+    pub async fn list_user_keys(
+        &self,
+        params: ListUserKeysPathParams<'_>,
+        body: &UserKeyQuery,
+    ) -> Result<ApiKeyListResponse, SdkError> {
+        let path_params = vec![("user_id", params.user_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&LIST_USER_KEYS_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<ApiKeyListResponse>(result.body)
     }
 
     /// Lists sessions for a user.
@@ -827,26 +1010,6 @@ impl IamClient {
             .invoke(&REVOKE_USER_SESSION_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<UserSessionResponse>(result.body)
-    }
-
-    /// Rotates a service account key.
-    pub async fn rotate_service_account_key(
-        &self,
-        params: RotateServiceAccountKeyPathParams<'_>,
-        body: &ServiceAccountQuery,
-    ) -> Result<ServiceAccountKeyResponse, SdkError> {
-        let path_params = vec![("service_account_id", params.service_account_id.to_string())];
-        let result = self
-            .inner
-            .invoke(
-                &ROTATE_SERVICE_ACCOUNT_KEY_SPEC,
-                &path_params,
-                Some(body),
-                None,
-            )
-            .await?;
-        self.inner
-            .deserialize::<ServiceAccountKeyResponse>(result.body)
     }
 
     /// Sets MFA requirement for a user.
@@ -1018,6 +1181,11 @@ pub struct AttachPolicyToPrincipalPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct CreateServiceAccountKeyPathParams<'a> {
+    pub service_account_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct CreateSigningKeyPathParams<'a> {
     pub tenant: &'a str,
 }
@@ -1030,6 +1198,11 @@ pub struct CreateTenantGroupPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct CreateTenantUserPathParams<'a> {
     pub tenant: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct CreateUserKeyPathParams<'a> {
+    pub user_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -1059,8 +1232,20 @@ pub struct DeleteServiceAccountPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct DeleteServiceAccountKeyPathParams<'a> {
+    pub service_account_id: &'a str,
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct DeleteUserPathParams<'a> {
     pub user_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct DeleteUserKeyPathParams<'a> {
+    pub user_id: &'a str,
+    pub key_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -1080,13 +1265,37 @@ pub struct DetachPolicyFromPrincipalPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct DisableServiceAccountKeyPathParams<'a> {
+    pub service_account_id: &'a str,
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct DisableUserPathParams<'a> {
     pub user_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
+pub struct DisableUserKeyPathParams<'a> {
+    pub user_id: &'a str,
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct EnableServiceAccountKeyPathParams<'a> {
+    pub service_account_id: &'a str,
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct EnableUserPathParams<'a> {
     pub user_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct EnableUserKeyPathParams<'a> {
+    pub user_id: &'a str,
+    pub key_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -1166,6 +1375,16 @@ pub struct ListPrincipalManagedPoliciesPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct ListServiceAccountKeysPathParams<'a> {
+    pub service_account_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct ListUserKeysPathParams<'a> {
+    pub user_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct ListUserSessionsPathParams<'a> {
     pub user_id: &'a str,
 }
@@ -1191,11 +1410,6 @@ pub struct RevokeServiceAccountTokenPathParams<'a> {
 pub struct RevokeUserSessionPathParams<'a> {
     pub user_id: &'a str,
     pub session_id: &'a str,
-}
-
-#[derive(Clone, Debug)]
-pub struct RotateServiceAccountKeyPathParams<'a> {
-    pub service_account_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -1355,6 +1569,17 @@ const CREATE_SERVICE_ACCOUNT_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const CREATE_SERVICE_ACCOUNT_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "CreateServiceAccountKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/service-accounts/{service_account_id}/keys",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const CREATE_SIGNING_KEY_SPEC: OperationSpec = OperationSpec {
     name: "CreateSigningKey",
     method: SdkHttpMethod::Post,
@@ -1384,6 +1609,17 @@ const CREATE_TENANT_USER_SPEC: OperationSpec = OperationSpec {
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const CREATE_USER_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "CreateUserKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/users/{user_id}/keys",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
     pagination: None,
     lro: false,
 };
@@ -1443,10 +1679,32 @@ const DELETE_SERVICE_ACCOUNT_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const DELETE_SERVICE_ACCOUNT_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "DeleteServiceAccountKey",
+    method: SdkHttpMethod::Delete,
+    uri: "/iam/service-accounts/{service_account_id}/keys/{key_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const DELETE_USER_SPEC: OperationSpec = OperationSpec {
     name: "DeleteUser",
     method: SdkHttpMethod::Delete,
     uri: "/iam/users/{user_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DELETE_USER_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "DeleteUserKey",
+    method: SdkHttpMethod::Delete,
+    uri: "/iam/users/{user_id}/keys/{key_id}",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -1476,10 +1734,32 @@ const DETACH_POLICY_FROM_PRINCIPAL_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const DISABLE_SERVICE_ACCOUNT_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "DisableServiceAccountKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/service-accounts/{service_account_id}/keys/{key_id}/disable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const DISABLE_USER_SPEC: OperationSpec = OperationSpec {
     name: "DisableUser",
     method: SdkHttpMethod::Post,
     uri: "/iam/users/{user_id}/disable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DISABLE_USER_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "DisableUserKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/users/{user_id}/keys/{key_id}/disable",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -1498,10 +1778,32 @@ const EMIT_TOKEN_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const ENABLE_SERVICE_ACCOUNT_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "EnableServiceAccountKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/service-accounts/{service_account_id}/keys/{key_id}/enable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const ENABLE_USER_SPEC: OperationSpec = OperationSpec {
     name: "EnableUser",
     method: SdkHttpMethod::Post,
     uri: "/iam/users/{user_id}/enable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const ENABLE_USER_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "EnableUserKey",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/users/{user_id}/keys/{key_id}/enable",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -1751,6 +2053,17 @@ const LIST_ROLES_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const LIST_SERVICE_ACCOUNT_KEYS_SPEC: OperationSpec = OperationSpec {
+    name: "ListServiceAccountKeys",
+    method: SdkHttpMethod::Get,
+    uri: "/iam/service-accounts/{service_account_id}/keys",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const LIST_SERVICE_ACCOUNTS_SPEC: OperationSpec = OperationSpec {
     name: "ListServiceAccounts",
     method: SdkHttpMethod::Get,
@@ -1777,6 +2090,17 @@ const LIST_TENANTS_SPEC: OperationSpec = OperationSpec {
     name: "ListTenants",
     method: SdkHttpMethod::Get,
     uri: "/iam/tenants",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const LIST_USER_KEYS_SPEC: OperationSpec = OperationSpec {
+    name: "ListUserKeys",
+    method: SdkHttpMethod::Get,
+    uri: "/iam/users/{user_id}/keys",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -1876,17 +2200,6 @@ const REVOKE_USER_SESSION_SPEC: OperationSpec = OperationSpec {
     name: "RevokeUserSession",
     method: SdkHttpMethod::Delete,
     uri: "/iam/users/{user_id}/sessions/{session_id}",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: false,
-    pagination: None,
-    lro: false,
-};
-
-const ROTATE_SERVICE_ACCOUNT_KEY_SPEC: OperationSpec = OperationSpec {
-    name: "RotateServiceAccountKey",
-    method: SdkHttpMethod::Post,
-    uri: "/iam/service-accounts/{service_account_id}/keys/rotate",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,

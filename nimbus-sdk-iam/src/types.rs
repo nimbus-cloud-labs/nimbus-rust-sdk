@@ -2,6 +2,10 @@
 use serde_json::Value;
 
 pub type AccountRegistrationPayload = Value;
+pub type ApiKeyListResponse = Value;
+pub type ApiKeyListResponseKeysList = Value;
+pub type ApiKeyMetadata = Value;
+pub type ApiKeyResponse = Value;
 pub type AssumeRoleRequest = Value;
 pub type AuditEventEnvelope = Value;
 pub type AuditEventListResponse = Value;
@@ -69,7 +73,6 @@ pub type RoleResponsePolicyIdsList = Value;
 pub type RoleUpdatePayload = Value;
 pub type RoleUpdatePayloadAttributesMap = Value;
 pub type RoleUpdatePayloadPolicyIdsList = Value;
-pub type ServiceAccountKeyResponse = Value;
 pub type ServiceAccountListResponse = Value;
 pub type ServiceAccountListResponseServiceAccountsList = Value;
 pub type ServiceAccountPayload = Value;
@@ -112,6 +115,7 @@ pub type UpdatePolicy = Value;
 pub type UpdatePolicyStatementsList = Value;
 pub type UserDto = Value;
 pub type UserInvitePayload = Value;
+pub type UserKeyQuery = Value;
 pub type UserListResponse = Value;
 pub type UserListResponseUsersList = Value;
 pub type UserMfaRequirementPayload = Value;
