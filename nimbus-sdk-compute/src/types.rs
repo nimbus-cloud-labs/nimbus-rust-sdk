@@ -1,6 +1,12 @@
 //! Generated types – do not edit by hand.
 use serde_json::Value;
 
+pub type BootDecision = Value;
+pub type BootLookupPayload = Value;
+pub type BootLookupResponse = Value;
+pub type BootRegistryEntry = Value;
+pub type BootRegistryStatus = Value;
+pub type BootRegistryUpsertPayload = Value;
 pub type BootstrapCredentialsBody = Value;
 pub type BootstrapCredentialsResponse = Value;
 pub type CreateNetworkPayload = Value;

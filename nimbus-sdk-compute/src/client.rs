@@ -243,6 +243,18 @@ impl ComputeClient {
         self.inner.paginator(&LIST_NICS_SPEC, path_params)
     }
 
+    pub async fn lookup_pxe_boot(
+        &self,
+        body: &BootLookupPayload,
+    ) -> Result<BootLookupResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&LOOKUP_PXE_BOOT_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<BootLookupResponse>(result.body)
+    }
+
     pub async fn migrate_vm(
         &self,
         params: MigrateVmPathParams<'_>,
@@ -333,6 +345,24 @@ impl ComputeClient {
         self.inner.deserialize::<OperationHandle>(result.body)
     }
 
+    pub async fn upsert_boot_registry_entry(
+        &self,
+        params: UpsertBootRegistryEntryPathParams<'_>,
+        body: &BootRegistryUpsertPayload,
+    ) -> Result<BootRegistryEntry, SdkError> {
+        let path_params = vec![("mac", params.mac.to_string())];
+        let result = self
+            .inner
+            .invoke(
+                &UPSERT_BOOT_REGISTRY_ENTRY_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<BootRegistryEntry>(result.body)
+    }
+
     pub fn waiter(&self) -> LroWaiter {
         self.inner.waiter()
     }
@@ -414,6 +444,11 @@ pub struct StopVmPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct UpdateNetworkPathParams<'a> {
     pub network_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct UpsertBootRegistryEntryPathParams<'a> {
+    pub mac: &'a str,
 }
 
 const ATTACH_INTERFACE_SPEC: OperationSpec = OperationSpec {
@@ -618,6 +653,17 @@ const LIST_NICS_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const LOOKUP_PXE_BOOT_SPEC: OperationSpec = OperationSpec {
+    name: "LookupPxeBoot",
+    method: SdkHttpMethod::Post,
+    uri: "/internal/boot/pxe/lookup",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const MIGRATE_VM_SPEC: OperationSpec = OperationSpec {
     name: "MigrateVm",
     method: SdkHttpMethod::Post,
@@ -693,4 +739,15 @@ const UPDATE_NETWORK_SPEC: OperationSpec = OperationSpec {
     idempotent: true,
     pagination: None,
     lro: true,
+};
+
+const UPSERT_BOOT_REGISTRY_ENTRY_SPEC: OperationSpec = OperationSpec {
+    name: "UpsertBootRegistryEntry",
+    method: SdkHttpMethod::Put,
+    uri: "/internal/boot/registry/{mac}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
 };
