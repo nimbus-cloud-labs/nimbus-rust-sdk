@@ -84,6 +84,19 @@ impl DamManagementClient {
         self.inner.deserialize::<CollectionResponse>(result.body)
     }
 
+    pub async fn create_pipeline(
+        &self,
+        body: &CreatePipelineRequest,
+    ) -> Result<PipelineRecordResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&CREATE_PIPELINE_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner
+            .deserialize::<PipelineRecordResponse>(result.body)
+    }
+
     pub async fn create_smart_album(
         &self,
         body: &CreateSmartAlbumRequest,
@@ -104,6 +117,18 @@ impl DamManagementClient {
         let result = self
             .inner
             .invoke(&DELETE_COLLECTION_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
+    }
+
+    pub async fn delete_pipeline(
+        &self,
+        params: DeletePipelinePathParams<'_>,
+    ) -> Result<Value, SdkError> {
+        let path_params = vec![("pipeline_id", params.pipeline_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&DELETE_PIPELINE_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -153,6 +178,15 @@ impl DamManagementClient {
             .await?;
         self.inner
             .deserialize::<CollectionListResponse>(result.body)
+    }
+
+    pub async fn list_pipelines(&self) -> Result<PipelineListResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&LIST_PIPELINES_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<PipelineListResponse>(result.body)
     }
 
     pub async fn list_smart_albums(&self) -> Result<SmartAlbumListResponse, SdkError> {
@@ -292,6 +326,20 @@ impl DamManagementClient {
         self.inner.deserialize::<CollectionResponse>(result.body)
     }
 
+    pub async fn update_pipeline(
+        &self,
+        params: UpdatePipelinePathParams<'_>,
+        body: &UpdatePipelineRequest,
+    ) -> Result<PipelineRecordResponse, SdkError> {
+        let path_params = vec![("pipeline_id", params.pipeline_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&UPDATE_PIPELINE_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner
+            .deserialize::<PipelineRecordResponse>(result.body)
+    }
+
     pub async fn update_smart_album(
         &self,
         params: UpdateSmartAlbumPathParams<'_>,
@@ -318,6 +366,11 @@ pub struct ArchiveAssetPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct DeleteCollectionPathParams<'a> {
     pub collection_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct DeletePipelinePathParams<'a> {
+    pub pipeline_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -364,6 +417,11 @@ pub struct RestoreAssetPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct UpdateCollectionPathParams<'a> {
     pub collection_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct UpdatePipelinePathParams<'a> {
+    pub pipeline_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -415,6 +473,17 @@ const CREATE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const CREATE_PIPELINE_SPEC: OperationSpec = OperationSpec {
+    name: "CreatePipeline",
+    method: SdkHttpMethod::Post,
+    uri: "/pipelines",
+    success_code: 201,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const CREATE_SMART_ALBUM_SPEC: OperationSpec = OperationSpec {
     name: "CreateSmartAlbum",
     method: SdkHttpMethod::Post,
@@ -430,6 +499,17 @@ const DELETE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     name: "DeleteCollection",
     method: SdkHttpMethod::Delete,
     uri: "/collections/{collection_id}",
+    success_code: 204,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DELETE_PIPELINE_SPEC: OperationSpec = OperationSpec {
+    name: "DeletePipeline",
+    method: SdkHttpMethod::Delete,
+    uri: "/pipelines/{pipeline_id}",
     success_code: 204,
     additional_success_responses: &[],
     idempotent: false,
@@ -474,6 +554,17 @@ const LIST_COLLECTIONS_SPEC: OperationSpec = OperationSpec {
     name: "ListCollections",
     method: SdkHttpMethod::Get,
     uri: "/collections",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const LIST_PIPELINES_SPEC: OperationSpec = OperationSpec {
+    name: "ListPipelines",
+    method: SdkHttpMethod::Get,
+    uri: "/pipelines",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -584,6 +675,17 @@ const UPDATE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     name: "UpdateCollection",
     method: SdkHttpMethod::Post,
     uri: "/collections/{collection_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const UPDATE_PIPELINE_SPEC: OperationSpec = OperationSpec {
+    name: "UpdatePipeline",
+    method: SdkHttpMethod::Post,
+    uri: "/pipelines/{pipeline_id}",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
