@@ -1,8 +1,15 @@
 //! Generated types – do not edit by hand.
 use serde_json::Value;
 
+pub type AssetDetailResponse = Value;
+pub type AssetDownloadResponse = Value;
 pub type AssetFilterPayload = Value;
 pub type AssetFilterPayloadPathList = Value;
+pub type AssetPrefixListResponse = Value;
+pub type AssetPrefixListResponseItemsList = Value;
+pub type AssetPrefixRecord = Value;
+pub type AssetPrefixResponse = Value;
+pub type AssetRecord = Value;
 pub type AssetSearchItem = Value;
 pub type AssetSearchRequest = Value;
 pub type AssetSearchRequestFiltersList = Value;
@@ -20,6 +27,7 @@ pub type CollectionMembershipRequest = Value;
 pub type CollectionMembershipResponse = Value;
 pub type CollectionResponse = Value;
 pub type CompleteIngestionRequest = Value;
+pub type CreateAssetPrefixRequest = Value;
 pub type CreateCollectionRequest = Value;
 pub type CreatePipelineRequest = Value;
 pub type CreatePipelineRequestRenditionsList = Value;

@@ -72,6 +72,30 @@ impl DamManagementClient {
         self.inner.deserialize::<OperationResponse>(result.body)
     }
 
+    pub async fn create_asset_download(
+        &self,
+        params: CreateAssetDownloadPathParams<'_>,
+    ) -> Result<AssetDownloadResponse, SdkError> {
+        let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&CREATE_ASSET_DOWNLOAD_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<AssetDownloadResponse>(result.body)
+    }
+
+    pub async fn create_asset_prefix(
+        &self,
+        body: &CreateAssetPrefixRequest,
+    ) -> Result<AssetPrefixResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&CREATE_ASSET_PREFIX_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<AssetPrefixResponse>(result.body)
+    }
+
     pub async fn create_collection(
         &self,
         body: &CreateCollectionRequest,
@@ -107,6 +131,18 @@ impl DamManagementClient {
             .invoke(&CREATE_SMART_ALBUM_SPEC, &path_params, Some(body), None)
             .await?;
         self.inner.deserialize::<SmartAlbumResponse>(result.body)
+    }
+
+    pub async fn delete_asset_prefix(
+        &self,
+        params: DeleteAssetPrefixPathParams<'_>,
+    ) -> Result<Value, SdkError> {
+        let path_params = vec![("prefix_id", params.prefix_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&DELETE_ASSET_PREFIX_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
     }
 
     pub async fn delete_collection(
@@ -145,6 +181,18 @@ impl DamManagementClient {
         self.inner.deserialize::<Value>(result.body)
     }
 
+    pub async fn get_asset(
+        &self,
+        params: GetAssetPathParams<'_>,
+    ) -> Result<AssetDetailResponse, SdkError> {
+        let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&GET_ASSET_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<AssetDetailResponse>(result.body)
+    }
+
     pub async fn get_operation(
         &self,
         params: GetOperationPathParams<'_>,
@@ -155,6 +203,16 @@ impl DamManagementClient {
             .invoke(&GET_OPERATION_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<OperationResponse>(result.body)
+    }
+
+    pub async fn list_asset_prefixes(&self) -> Result<AssetPrefixListResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&LIST_ASSET_PREFIXES_SPEC, &path_params, None, None)
+            .await?;
+        self.inner
+            .deserialize::<AssetPrefixListResponse>(result.body)
     }
 
     pub async fn list_collection_memberships(
@@ -284,6 +342,18 @@ impl DamManagementClient {
         self.inner.deserialize::<LifecycleResponse>(result.body)
     }
 
+    pub async fn retry_operation(
+        &self,
+        params: RetryOperationPathParams<'_>,
+    ) -> Result<OperationResponse, SdkError> {
+        let path_params = vec![("operation_id", params.operation_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&RETRY_OPERATION_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<OperationResponse>(result.body)
+    }
+
     pub async fn search_assets(
         &self,
         body: &AssetSearchRequest,
@@ -364,6 +434,16 @@ pub struct ArchiveAssetPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct CreateAssetDownloadPathParams<'a> {
+    pub asset_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct DeleteAssetPrefixPathParams<'a> {
+    pub prefix_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct DeleteCollectionPathParams<'a> {
     pub collection_id: &'a str,
 }
@@ -376,6 +456,11 @@ pub struct DeletePipelinePathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct DeleteSmartAlbumPathParams<'a> {
     pub album_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct GetAssetPathParams<'a> {
+    pub asset_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -412,6 +497,11 @@ pub struct RemoveCollectionMembershipPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct RestoreAssetPathParams<'a> {
     pub asset_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct RetryOperationPathParams<'a> {
+    pub operation_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -462,6 +552,28 @@ const COMPLETE_ASSET_INGESTION_SPEC: OperationSpec = OperationSpec {
     lro: true,
 };
 
+const CREATE_ASSET_DOWNLOAD_SPEC: OperationSpec = OperationSpec {
+    name: "CreateAssetDownload",
+    method: SdkHttpMethod::Post,
+    uri: "/assets/{asset_id}/download",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const CREATE_ASSET_PREFIX_SPEC: OperationSpec = OperationSpec {
+    name: "CreateAssetPrefix",
+    method: SdkHttpMethod::Post,
+    uri: "/assets/prefixes",
+    success_code: 201,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const CREATE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     name: "CreateCollection",
     method: SdkHttpMethod::Post,
@@ -489,6 +601,17 @@ const CREATE_SMART_ALBUM_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Post,
     uri: "/albums",
     success_code: 201,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DELETE_ASSET_PREFIX_SPEC: OperationSpec = OperationSpec {
+    name: "DeleteAssetPrefix",
+    method: SdkHttpMethod::Delete,
+    uri: "/assets/prefixes/{prefix_id}",
+    success_code: 204,
     additional_success_responses: &[],
     idempotent: false,
     pagination: None,
@@ -528,10 +651,32 @@ const DELETE_SMART_ALBUM_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const GET_ASSET_SPEC: OperationSpec = OperationSpec {
+    name: "GetAsset",
+    method: SdkHttpMethod::Get,
+    uri: "/assets/{asset_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const GET_OPERATION_SPEC: OperationSpec = OperationSpec {
     name: "GetOperation",
     method: SdkHttpMethod::Get,
     uri: "/operations/{operation_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const LIST_ASSET_PREFIXES_SPEC: OperationSpec = OperationSpec {
+    name: "ListAssetPrefixes",
+    method: SdkHttpMethod::Get,
+    uri: "/assets/prefixes",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -647,6 +792,17 @@ const RESTORE_ASSET_SPEC: OperationSpec = OperationSpec {
     idempotent: false,
     pagination: None,
     lro: false,
+};
+
+const RETRY_OPERATION_SPEC: OperationSpec = OperationSpec {
+    name: "RetryOperation",
+    method: SdkHttpMethod::Post,
+    uri: "/operations/{operation_id}/retry",
+    success_code: 202,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: true,
 };
 
 const SEARCH_ASSETS_SPEC: OperationSpec = OperationSpec {
