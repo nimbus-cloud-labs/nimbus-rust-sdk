@@ -96,6 +96,26 @@ impl DamManagementClient {
         self.inner.deserialize::<AssetPrefixResponse>(result.body)
     }
 
+    pub async fn create_asset_rendition_download(
+        &self,
+        params: CreateAssetRenditionDownloadPathParams<'_>,
+    ) -> Result<AssetDownloadResponse, SdkError> {
+        let path_params = vec![
+            ("asset_id", params.asset_id.to_string()),
+            ("rendition_id", params.rendition_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(
+                &CREATE_ASSET_RENDITION_DOWNLOAD_SPEC,
+                &path_params,
+                None,
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<AssetDownloadResponse>(result.body)
+    }
+
     pub async fn create_collection(
         &self,
         body: &CreateCollectionRequest,
@@ -131,6 +151,15 @@ impl DamManagementClient {
             .invoke(&CREATE_SMART_ALBUM_SPEC, &path_params, Some(body), None)
             .await?;
         self.inner.deserialize::<SmartAlbumResponse>(result.body)
+    }
+
+    pub async fn delete_asset(&self, params: DeleteAssetPathParams<'_>) -> Result<Value, SdkError> {
+        let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&DELETE_ASSET_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
     }
 
     pub async fn delete_asset_prefix(
@@ -193,6 +222,21 @@ impl DamManagementClient {
         self.inner.deserialize::<AssetDetailResponse>(result.body)
     }
 
+    pub async fn get_asset_rendition(
+        &self,
+        params: GetAssetRenditionPathParams<'_>,
+    ) -> Result<AssetRenditionRecord, SdkError> {
+        let path_params = vec![
+            ("asset_id", params.asset_id.to_string()),
+            ("rendition_id", params.rendition_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(&GET_ASSET_RENDITION_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<AssetRenditionRecord>(result.body)
+    }
+
     pub async fn get_operation(
         &self,
         params: GetOperationPathParams<'_>,
@@ -213,6 +257,19 @@ impl DamManagementClient {
             .await?;
         self.inner
             .deserialize::<AssetPrefixListResponse>(result.body)
+    }
+
+    pub async fn list_asset_renditions(
+        &self,
+        params: ListAssetRenditionsPathParams<'_>,
+    ) -> Result<AssetRenditionListResponse, SdkError> {
+        let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&LIST_ASSET_RENDITIONS_SPEC, &path_params, None, None)
+            .await?;
+        self.inner
+            .deserialize::<AssetRenditionListResponse>(result.body)
     }
 
     pub async fn list_collection_memberships(
@@ -439,6 +496,17 @@ pub struct CreateAssetDownloadPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct CreateAssetRenditionDownloadPathParams<'a> {
+    pub asset_id: &'a str,
+    pub rendition_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct DeleteAssetPathParams<'a> {
+    pub asset_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct DeleteAssetPrefixPathParams<'a> {
     pub prefix_id: &'a str,
 }
@@ -464,8 +532,19 @@ pub struct GetAssetPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct GetAssetRenditionPathParams<'a> {
+    pub asset_id: &'a str,
+    pub rendition_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct GetOperationPathParams<'a> {
     pub operation_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct ListAssetRenditionsPathParams<'a> {
+    pub asset_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -574,6 +653,17 @@ const CREATE_ASSET_PREFIX_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const CREATE_ASSET_RENDITION_DOWNLOAD_SPEC: OperationSpec = OperationSpec {
+    name: "CreateAssetRenditionDownload",
+    method: SdkHttpMethod::Post,
+    uri: "/assets/{asset_id}/renditions/{rendition_id}/download",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const CREATE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     name: "CreateCollection",
     method: SdkHttpMethod::Post,
@@ -601,6 +691,17 @@ const CREATE_SMART_ALBUM_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Post,
     uri: "/albums",
     success_code: 201,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DELETE_ASSET_SPEC: OperationSpec = OperationSpec {
+    name: "DeleteAsset",
+    method: SdkHttpMethod::Delete,
+    uri: "/assets/{asset_id}",
+    success_code: 204,
     additional_success_responses: &[],
     idempotent: false,
     pagination: None,
@@ -662,6 +763,17 @@ const GET_ASSET_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const GET_ASSET_RENDITION_SPEC: OperationSpec = OperationSpec {
+    name: "GetAssetRendition",
+    method: SdkHttpMethod::Get,
+    uri: "/assets/{asset_id}/renditions/{rendition_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const GET_OPERATION_SPEC: OperationSpec = OperationSpec {
     name: "GetOperation",
     method: SdkHttpMethod::Get,
@@ -677,6 +789,17 @@ const LIST_ASSET_PREFIXES_SPEC: OperationSpec = OperationSpec {
     name: "ListAssetPrefixes",
     method: SdkHttpMethod::Get,
     uri: "/assets/prefixes",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const LIST_ASSET_RENDITIONS_SPEC: OperationSpec = OperationSpec {
+    name: "ListAssetRenditions",
+    method: SdkHttpMethod::Get,
+    uri: "/assets/{asset_id}/renditions",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
