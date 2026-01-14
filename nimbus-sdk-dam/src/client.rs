@@ -440,6 +440,45 @@ impl DamManagementClient {
         self.inner.deserialize::<AssetSearchResponse>(result.body)
     }
 
+    pub async fn update_asset_custom_metadata(
+        &self,
+        params: UpdateAssetCustomMetadataPathParams<'_>,
+        body: &CustomMetadataRequest,
+    ) -> Result<Value, SdkError> {
+        let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let result = self
+            .inner
+            .invoke(
+                &UPDATE_ASSET_CUSTOM_METADATA_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
+    }
+
+    pub async fn update_asset_version_custom_metadata(
+        &self,
+        params: UpdateAssetVersionCustomMetadataPathParams<'_>,
+        body: &CustomMetadataRequest,
+    ) -> Result<Value, SdkError> {
+        let path_params = vec![
+            ("asset_id", params.asset_id.to_string()),
+            ("version_id", params.version_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(
+                &UPDATE_ASSET_VERSION_CUSTOM_METADATA_SPEC,
+                &path_params,
+                Some(body),
+                None,
+            )
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
+    }
+
     pub async fn update_collection(
         &self,
         params: UpdateCollectionPathParams<'_>,
@@ -581,6 +620,17 @@ pub struct RestoreAssetPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct RetryOperationPathParams<'a> {
     pub operation_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct UpdateAssetCustomMetadataPathParams<'a> {
+    pub asset_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct UpdateAssetVersionCustomMetadataPathParams<'a> {
+    pub asset_id: &'a str,
+    pub version_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
@@ -944,6 +994,28 @@ const SEARCH_ASSETS_WITH_BODY_SPEC: OperationSpec = OperationSpec {
     method: SdkHttpMethod::Post,
     uri: "/assets/search",
     success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const UPDATE_ASSET_CUSTOM_METADATA_SPEC: OperationSpec = OperationSpec {
+    name: "UpdateAssetCustomMetadata",
+    method: SdkHttpMethod::Post,
+    uri: "/assets/{asset_id}/metadata/custom",
+    success_code: 204,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const UPDATE_ASSET_VERSION_CUSTOM_METADATA_SPEC: OperationSpec = OperationSpec {
+    name: "UpdateAssetVersionCustomMetadata",
+    method: SdkHttpMethod::Post,
+    uri: "/assets/{asset_id}/versions/{version_id}/metadata/custom",
+    success_code: 204,
     additional_success_responses: &[],
     idempotent: false,
     pagination: None,

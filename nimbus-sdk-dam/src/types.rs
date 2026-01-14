@@ -37,6 +37,7 @@ pub type CreatePipelineRequestRenditionsList = Value;
 pub type CreatePipelineRequestRulesList = Value;
 pub type CreateSmartAlbumRequest = Value;
 pub type CreateSmartAlbumRequestRulesList = Value;
+pub type CustomMetadataRequest = Value;
 pub type IndexSnapshotRequest = Value;
 pub type IndexSnapshotResponse = Value;
 pub type IngestionRequest = Value;
