@@ -237,6 +237,22 @@ impl DamManagementClient {
         self.inner.deserialize::<AssetRenditionRecord>(result.body)
     }
 
+    pub async fn get_asset_version_metadata(
+        &self,
+        params: GetAssetVersionMetadataPathParams<'_>,
+    ) -> Result<AssetVersionMetadataResponse, SdkError> {
+        let path_params = vec![
+            ("asset_id", params.asset_id.to_string()),
+            ("version_id", params.version_id.to_string()),
+        ];
+        let result = self
+            .inner
+            .invoke(&GET_ASSET_VERSION_METADATA_SPEC, &path_params, None, None)
+            .await?;
+        self.inner
+            .deserialize::<AssetVersionMetadataResponse>(result.body)
+    }
+
     pub async fn get_operation(
         &self,
         params: GetOperationPathParams<'_>,
@@ -577,6 +593,12 @@ pub struct GetAssetRenditionPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct GetAssetVersionMetadataPathParams<'a> {
+    pub asset_id: &'a str,
+    pub version_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct GetOperationPathParams<'a> {
     pub operation_id: &'a str,
 }
@@ -817,6 +839,17 @@ const GET_ASSET_RENDITION_SPEC: OperationSpec = OperationSpec {
     name: "GetAssetRendition",
     method: SdkHttpMethod::Get,
     uri: "/assets/{asset_id}/renditions/{rendition_id}",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const GET_ASSET_VERSION_METADATA_SPEC: OperationSpec = OperationSpec {
+    name: "GetAssetVersionMetadata",
+    method: SdkHttpMethod::Get,
+    uri: "/assets/{asset_id}/versions/{version_id}/metadata",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
