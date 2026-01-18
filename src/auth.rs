@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 use tracing::debug;
 
 #[cfg(feature = "env-provider")]
@@ -124,4 +126,114 @@ impl AuthTokenProvider for StaticTokenProvider {
             Ok(self.header_value.clone())
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct StaticKeyCredentials {
+    pub access_key: String,
+    pub secret_key: String,
+    pub session_token: Option<String>,
+}
+
+impl StaticKeyCredentials {
+    pub fn new(
+        access_key: impl Into<String>,
+        secret_key: impl Into<String>,
+    ) -> Result<Self, AuthError> {
+        let access_key = access_key.into();
+        let secret_key = secret_key.into();
+        validate_access_key(&access_key)?;
+        validate_secret_key(&secret_key)?;
+        Ok(Self {
+            access_key,
+            secret_key,
+            session_token: None,
+        })
+    }
+
+    pub fn with_session_token(mut self, token: impl Into<String>) -> Result<Self, AuthError> {
+        let token = token.into();
+        validate_session_token(&token)?;
+        self.session_token = Some(token);
+        Ok(self)
+    }
+}
+
+pub struct StaticKeyProvider {
+    credentials: StaticKeyCredentials,
+}
+
+impl StaticKeyProvider {
+    pub fn new(credentials: StaticKeyCredentials) -> Self {
+        Self { credentials }
+    }
+}
+
+#[async_trait]
+impl AuthTokenProvider for StaticKeyProvider {
+    async fn authorization_header(&self) -> Result<String, AuthError> {
+        if let Some(token) = &self.credentials.session_token {
+            if token.is_empty() {
+                return Err(AuthError::MissingValue);
+            }
+            return Ok(format!("Bearer {}", token));
+        }
+        if self.credentials.access_key.is_empty() || self.credentials.secret_key.is_empty() {
+            return Err(AuthError::MissingValue);
+        }
+        let raw = format!(
+            "{}:{}",
+            self.credentials.access_key, self.credentials.secret_key
+        );
+        let encoded = STANDARD.encode(raw.as_bytes());
+        Ok(format!("Basic {}", encoded))
+    }
+}
+
+fn validate_access_key(value: &str) -> Result<(), AuthError> {
+    if value.len() != 20 {
+        return Err(AuthError::Message(
+            "access key must be exactly 20 characters".to_string(),
+        ));
+    }
+    if !value
+        .chars()
+        .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit())
+    {
+        return Err(AuthError::Message(
+            "access key must contain only uppercase A-Z or digits 0-9".to_string(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_secret_key(value: &str) -> Result<(), AuthError> {
+    if value.len() != 44 {
+        return Err(AuthError::Message(
+            "secret key must be exactly 44 characters".to_string(),
+        ));
+    }
+    if !value
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+    {
+        return Err(AuthError::Message(
+            "secret key must be URL-safe base64 without padding".to_string(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_session_token(value: &str) -> Result<(), AuthError> {
+    if value.len() > 512 {
+        return Err(AuthError::Message(
+            "session token exceeds 512 characters".to_string(),
+        ));
+    }
+    let decoded = STANDARD
+        .decode(value.as_bytes())
+        .map_err(|err| AuthError::Message(format!("session token is not base64 encoded: {err}")))?;
+    serde_json::from_slice::<serde_json::Value>(&decoded)
+        .map_err(|err| AuthError::Message(format!("session token is not valid JSON: {err}")))?;
+    Ok(())
 }

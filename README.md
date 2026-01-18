@@ -23,6 +23,27 @@ When troubleshooting credential resolution, refer to the
 The [credential provider precedence overview](../../docs/sdk/credential-provider-strategy.md#credential-provider-precedence)
 contains a diagram and comparison tables summarizing provider overrides, caching, and error reporting.
 
+## Static access keys
+Applications can pass access key credentials directly when they do not want to
+load environment variables:
+
+```rust
+use std::sync::Arc;
+
+use nimbus_sdk_core::auth::{StaticKeyCredentials, StaticKeyProvider};
+use nimbus_sdk_core::client::SdkConfigBuilder;
+
+let credentials = StaticKeyCredentials::new(
+    "ABCDEFGHIJKLMNOPQRST",
+    "abcdEFGHijklMNOPqrstUVWXyz0123456789ABCDabcd",
+)?
+.with_session_token("eyJ0b2tlbiI6ICJ0ZXN0In0=")?;
+let config = SdkConfigBuilder::default()
+    .auth(Arc::new(StaticKeyProvider::new(credentials)))
+    .endpoint("https://api.nimbus.eu")
+    .build()?;
+```
+
 ## Instance metadata credentials
 
 Workloads running on Nimbus compute instances can retrieve rotating credentials

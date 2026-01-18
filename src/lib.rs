@@ -14,7 +14,7 @@ pub mod transport;
 
 pub use auth::{
     default_chain as default_auth_chain, AuthError, AuthProviderChain, AuthTokenProvider,
-    StaticTokenProvider,
+    StaticKeyCredentials, StaticKeyProvider, StaticTokenProvider,
 };
 pub use client::{
     AdditionalSuccessResponseSpec, BuildError, NimbusClient, OperationResult, OperationSpec,
