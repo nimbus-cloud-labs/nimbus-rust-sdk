@@ -23,7 +23,7 @@ use nimbus_sdk_iam::IamClient;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = SdkConfigBuilder::default()
-        .endpoint("https://api.nimbus.eu")
+        .endpoint("https://api.nimbuscloudplatform.com")
         .auth(Arc::new(StaticTokenProvider::bearer("token")))
         .build()?;
 
@@ -54,7 +54,7 @@ let credentials = StaticKeyCredentials::new(
     "abcdEFGHijklMNOPqrstUVWXyz0123456789ABCDabcd",
 )?;
 let config = SdkConfigBuilder::default()
-    .endpoint("https://api.nimbus.eu")
+    .endpoint("https://api.nimbuscloudplatform.com")
     .auth(Arc::new(StaticKeyProvider::new(credentials)))
     .build()?;
 ```
