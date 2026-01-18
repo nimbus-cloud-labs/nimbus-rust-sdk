@@ -1,31 +1,47 @@
 # Nimbus Rust SDK
 
-The Rust SDK provides strongly typed clients generated from the shared Smithy
-models. Packages under this directory are published together to ensure feature
-parity with the TypeScript distribution.
+Nimbus Rust SDK provides strongly typed clients generated from shared Smithy models. This package is the canonical reference for SDK semantics (auth, pagination, LRO, error mapping).
 
-## Credential environment variables
-The Rust crates rely on `NimbusCredentialProvider` to resolve authentication
-material. By default the provider reads the environment variables documented in
-[`docs/sdk/glossary.md`](../../docs/sdk/glossary.md#credential-environment-variables).
-Profiles are resolved by appending the uppercase suffix described in the
-glossary (for example, `NIMBUS_ACCESS_KEY_SRE`).
+## Install
+Add the core runtime and service crates to your `Cargo.toml`:
 
-Unlike Cargo configuration flags, environment variables are read at runtime by
-the SDK. Flags such as `cargo run --features` or `cargo run -- --access-key`
-only affect the build invocation or a specific binary execution and do not
-propagate to dependent crates. Environment variables keep credentials outside
-shell history and work for `cargo test`, integration tools, and compiled
-artifacts executed later.
+```toml
+[dependencies]
+nimbus-sdk-core = { version = "0.1.0" }
+nimbus-sdk-iam = { version = "0.1.0" }
+```
 
-When troubleshooting credential resolution, refer to the
-[glossary troubleshooting notes](../../docs/sdk/glossary.md#troubleshooting).
-The [credential provider precedence overview](../../docs/sdk/credential-provider-strategy.md#credential-provider-precedence)
-contains a diagram and comparison tables summarizing provider overrides, caching, and error reporting.
+## Quickstart
 
-## Static access keys
-Applications can pass access key credentials directly when they do not want to
-load environment variables:
+```rust
+use std::sync::Arc;
+
+use nimbus_sdk_core::client::SdkConfigBuilder;
+use nimbus_sdk_core::auth::StaticTokenProvider;
+use nimbus_sdk_iam::IamClient;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = SdkConfigBuilder::default()
+        .endpoint("https://api.nimbus.eu")
+        .auth(Arc::new(StaticTokenProvider::bearer("token")))
+        .build()?;
+
+    let client = IamClient::new(config.into());
+    let response = client.emit_token(&serde_json::json!({
+        "urn": "urn:nimbus:iam::123",
+        "typ": "access"
+    }))
+    .await?;
+
+    println!("{}", response["token"]);
+    Ok(())
+}
+```
+
+## Authentication
+- **Environment provider (default):** Reads `NIMBUS_*` variables from the environment.
+- **Static access keys:** Provide access/secret keys directly when you do not want environment resolution.
 
 ```rust
 use std::sync::Arc;
@@ -36,20 +52,16 @@ use nimbus_sdk_core::client::SdkConfigBuilder;
 let credentials = StaticKeyCredentials::new(
     "ABCDEFGHIJKLMNOPQRST",
     "abcdEFGHijklMNOPqrstUVWXyz0123456789ABCDabcd",
-)?
-.with_session_token("eyJ0b2tlbiI6ICJ0ZXN0In0=")?;
+)?;
 let config = SdkConfigBuilder::default()
-    .auth(Arc::new(StaticKeyProvider::new(credentials)))
     .endpoint("https://api.nimbus.eu")
+    .auth(Arc::new(StaticKeyProvider::new(credentials)))
     .build()?;
 ```
 
-## Instance metadata credentials
+## Pagination and LRO
+Generated clients expose paginator helpers and `.wait()` for long-running operations. These follow Smithy traits and align across languages.
 
-Workloads running on Nimbus compute instances can retrieve rotating credentials
-from the metadata service described in
-[`docs/compute/metadata-service.md`](../../docs/compute/metadata-service.md).
-The document covers the required headers, token time-to-live limits, network
-allowlisting, and the 30 requests per second rate policy enforced by the
-platform. Integrations should reuse the shared HTTP client stack so retries and
-token refresh logic remain consistent across SDK components.
+## Development
+- Regenerate SDK clients from Smithy models using the bundled generator.
+- Run `cargo fmt --all` and `cargo clippy --all-targets --all-features -- -D warnings` before submitting changes.
