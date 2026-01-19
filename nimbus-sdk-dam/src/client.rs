@@ -402,6 +402,18 @@ impl DamManagementClient {
         self.inner.deserialize::<Value>(result.body)
     }
 
+    pub async fn rerun_pipelines(
+        &self,
+        body: &PipelineRerunRequest,
+    ) -> Result<PipelineRerunResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&RERUN_PIPELINES_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<PipelineRerunResponse>(result.body)
+    }
+
     pub async fn restore_asset(
         &self,
         params: RestoreAssetPathParams<'_>,
@@ -987,6 +999,17 @@ const REMOVE_COLLECTION_MEMBERSHIP_SPEC: OperationSpec = OperationSpec {
     idempotent: false,
     pagination: None,
     lro: false,
+};
+
+const RERUN_PIPELINES_SPEC: OperationSpec = OperationSpec {
+    name: "RerunPipelines",
+    method: SdkHttpMethod::Post,
+    uri: "/pipelines/rerun",
+    success_code: 202,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: true,
 };
 
 const RESTORE_ASSET_SPEC: OperationSpec = OperationSpec {
