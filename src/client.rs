@@ -115,11 +115,11 @@ impl NimbusClient {
             }
         }
 
-        let auth = self.inner.auth.authorization_header().await?;
-        headers.insert(
-            http::header::AUTHORIZATION,
-            HeaderValue::from_str(&auth).map_err(SdkError::Header)?,
-        );
+        let payload_bytes = match body {
+            Some(value) => serde_json::to_vec(value).map_err(SdkError::Json)?,
+            None => Vec::new(),
+        };
+        self.inner.auth.apply(&mut headers, &payload_bytes).await?;
 
         let request = TransportRequest {
             method: spec.method,

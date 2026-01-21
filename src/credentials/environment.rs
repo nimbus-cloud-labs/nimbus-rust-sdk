@@ -8,6 +8,7 @@ use base64::Engine;
 use tracing::{debug, warn};
 
 use crate::auth::{AuthError, AuthTokenProvider};
+use http::HeaderMap;
 
 const PROFILE_ENV: &str = "NIMBUS_PROFILE";
 const PROFILE_PREFIX: &str = "NIMBUS_PROFILE";
@@ -237,9 +238,9 @@ impl EnvironmentCredentialProvider {
 
 #[async_trait]
 impl AuthTokenProvider for EnvironmentCredentialProvider {
-    async fn authorization_header(&self) -> Result<String, AuthError> {
+    async fn apply(&self, headers: &mut HeaderMap, payload: &[u8]) -> Result<(), AuthError> {
         let credentials = self.resolve()?;
-        credentials.authorization_header()
+        credentials.apply(headers, payload)
     }
 }
 
@@ -253,24 +254,27 @@ struct Credentials {
 }
 
 impl Credentials {
-    fn authorization_header(&self) -> Result<String, AuthError> {
+    fn apply(&self, headers: &mut HeaderMap, payload: &[u8]) -> Result<(), AuthError> {
         if let Some(token) = &self.session_token {
             debug!(
                 target: "nimbus_sdk::auth",
                 scheme = "Bearer",
                 "using session token for authorization header"
             );
-            return Ok(format!("Bearer {}", token));
+            let header = http::header::HeaderValue::from_str(&format!("Bearer {}", token))
+                .map_err(|error| {
+                    AuthError::Message(format!("invalid authorization header: {error}"))
+                })?;
+            headers.insert(http::header::AUTHORIZATION, header);
+            return Ok(());
         }
 
         debug!(
             target: "nimbus_sdk::auth",
-            scheme = "Basic",
-            "session token missing, falling back to static key pair"
+            scheme = "NimbusHmac",
+            "session token missing, falling back to Nimbus HMAC"
         );
-        let raw = format!("{}:{}", self.access_key, self.secret_key);
-        let encoded = STANDARD.encode(raw.as_bytes());
-        Ok(format!("Basic {}", encoded))
+        crate::auth::apply_hmac_headers(headers, &self.access_key, &self.secret_key, payload)
     }
 }
 
@@ -341,8 +345,8 @@ fn normalize_profile(value: &str) -> Result<String, AuthError> {
 }
 
 fn validate_access_key(value: &str) -> Result<(), &'static str> {
-    if value.len() != 20 {
-        return Err("value must be exactly 20 characters");
+    if value.len() != 26 {
+        return Err("value must be exactly 26 characters");
     }
     if !value
         .chars()
@@ -354,8 +358,8 @@ fn validate_access_key(value: &str) -> Result<(), &'static str> {
 }
 
 fn validate_secret_key(value: &str) -> Result<(), &'static str> {
-    if value.len() != 44 {
-        return Err("value must be exactly 44 characters");
+    if value.len() != 64 {
+        return Err("value must be exactly 64 characters");
     }
     if !value
         .chars()

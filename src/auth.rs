@@ -3,6 +3,11 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
+use chrono::Utc;
+use hmac::{Hmac, Mac};
+use http::header::HeaderValue;
+use http::HeaderMap;
+use sha2::Sha256;
 use tracing::debug;
 
 #[cfg(feature = "env-provider")]
@@ -29,7 +34,7 @@ pub enum AuthError {
 
 #[async_trait]
 pub trait AuthTokenProvider: Send + Sync {
-    async fn authorization_header(&self) -> Result<String, AuthError>;
+    async fn apply(&self, headers: &mut HeaderMap, payload: &[u8]) -> Result<(), AuthError>;
 }
 
 /// Auth provider that tries multiple providers in sequence until one produces
@@ -50,17 +55,17 @@ impl AuthProviderChain {
 
 #[async_trait]
 impl AuthTokenProvider for AuthProviderChain {
-    async fn authorization_header(&self) -> Result<String, AuthError> {
+    async fn apply(&self, headers: &mut HeaderMap, payload: &[u8]) -> Result<(), AuthError> {
         let mut last_error: Option<AuthError> = None;
         for (index, provider) in self.providers.iter().enumerate() {
-            match provider.authorization_header().await {
-                Ok(value) => {
+            match provider.apply(headers, payload).await {
+                Ok(()) => {
                     debug!(
                         target: "nimbus_sdk::auth",
                         provider_index = index,
                         "authorization resolved via provider"
                     );
-                    return Ok(value);
+                    return Ok(());
                 }
                 Err(error) => {
                     debug!(
@@ -119,11 +124,11 @@ impl StaticTokenProvider {
 
 #[async_trait]
 impl AuthTokenProvider for StaticTokenProvider {
-    async fn authorization_header(&self) -> Result<String, AuthError> {
+    async fn apply(&self, headers: &mut HeaderMap, _payload: &[u8]) -> Result<(), AuthError> {
         if self.header_value.is_empty() {
             Err(AuthError::MissingValue)
         } else {
-            Ok(self.header_value.clone())
+            apply_authorization_header(headers, &self.header_value)
         }
     }
 }
@@ -171,29 +176,29 @@ impl StaticKeyProvider {
 
 #[async_trait]
 impl AuthTokenProvider for StaticKeyProvider {
-    async fn authorization_header(&self) -> Result<String, AuthError> {
+    async fn apply(&self, headers: &mut HeaderMap, payload: &[u8]) -> Result<(), AuthError> {
         if let Some(token) = &self.credentials.session_token {
             if token.is_empty() {
                 return Err(AuthError::MissingValue);
             }
-            return Ok(format!("Bearer {}", token));
+            return apply_authorization_header(headers, &format!("Bearer {}", token));
         }
         if self.credentials.access_key.is_empty() || self.credentials.secret_key.is_empty() {
             return Err(AuthError::MissingValue);
         }
-        let raw = format!(
-            "{}:{}",
-            self.credentials.access_key, self.credentials.secret_key
-        );
-        let encoded = STANDARD.encode(raw.as_bytes());
-        Ok(format!("Basic {}", encoded))
+        apply_hmac_headers(
+            headers,
+            &self.credentials.access_key,
+            &self.credentials.secret_key,
+            payload,
+        )
     }
 }
 
 fn validate_access_key(value: &str) -> Result<(), AuthError> {
-    if value.len() != 20 {
+    if value.len() != 26 {
         return Err(AuthError::Message(
-            "access key must be exactly 20 characters".to_string(),
+            "access key must be exactly 26 characters".to_string(),
         ));
     }
     if !value
@@ -208,9 +213,9 @@ fn validate_access_key(value: &str) -> Result<(), AuthError> {
 }
 
 fn validate_secret_key(value: &str) -> Result<(), AuthError> {
-    if value.len() != 44 {
+    if value.len() != 64 {
         return Err(AuthError::Message(
-            "secret key must be exactly 44 characters".to_string(),
+            "secret key must be exactly 64 characters".to_string(),
         ));
     }
     if !value
@@ -222,6 +227,49 @@ fn validate_secret_key(value: &str) -> Result<(), AuthError> {
         ));
     }
     Ok(())
+}
+
+type HmacSha256 = Hmac<Sha256>;
+
+const NIMBUS_SIGNATURE_HEADER: &str = "x-nimbus-signature";
+const NIMBUS_DATE_HEADER: &str = "x-nimbus-date";
+
+fn apply_authorization_header(headers: &mut HeaderMap, value: &str) -> Result<(), AuthError> {
+    let header = HeaderValue::from_str(value)
+        .map_err(|error| AuthError::Message(format!("invalid authorization header: {error}")))?;
+    headers.insert(http::header::AUTHORIZATION, header);
+    Ok(())
+}
+
+pub(crate) fn apply_hmac_headers(
+    headers: &mut HeaderMap,
+    access_key: &str,
+    secret_key: &str,
+    payload: &[u8],
+) -> Result<(), AuthError> {
+    let date = Utc::now().to_rfc3339();
+    let signature = compute_hmac_signature(access_key, secret_key, payload, &date)?;
+    let signature_header = HeaderValue::from_str(&signature)
+        .map_err(|error| AuthError::Message(format!("invalid signature header: {error}")))?;
+    let date_header = HeaderValue::from_str(&date)
+        .map_err(|error| AuthError::Message(format!("invalid date header: {error}")))?;
+    headers.insert(NIMBUS_SIGNATURE_HEADER, signature_header);
+    headers.insert(NIMBUS_DATE_HEADER, date_header);
+    Ok(())
+}
+
+fn compute_hmac_signature(
+    key_id: &str,
+    secret: &str,
+    payload: &[u8],
+    date: &str,
+) -> Result<String, AuthError> {
+    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
+        .map_err(|_| AuthError::Message("invalid hmac key".to_string()))?;
+    mac.update(payload);
+    mac.update(date.as_bytes());
+    let signature = hex::encode(mac.finalize().into_bytes());
+    Ok(format!("{key_id}:{signature}"))
 }
 
 fn validate_session_token(value: &str) -> Result<(), AuthError> {
