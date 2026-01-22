@@ -52,7 +52,7 @@ impl IamClient {
         body: &GroupMembershipPayload,
     ) -> Result<GroupMembershipDto, SdkError> {
         let path_params = vec![
-            ("tenant", params.tenant.to_string()),
+            ("account_id", params.account_id.to_string()),
             ("group_id", params.group_id.to_string()),
         ];
         let result = self
@@ -111,6 +111,35 @@ impl IamClient {
             )
             .await?;
         self.inner.deserialize::<Principal>(result.body)
+    }
+
+    /// Creates a group for an account.
+    pub async fn create_account_group(
+        &self,
+        params: CreateAccountGroupPathParams<'_>,
+        body: &GroupPayload,
+    ) -> Result<GroupDto, SdkError> {
+        let path_params = vec![("account_id", params.account_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&CREATE_ACCOUNT_GROUP_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<GroupDto>(result.body)
+    }
+
+    /// Creates a user within an account.
+    pub async fn create_account_user(
+        &self,
+        params: CreateAccountUserPathParams<'_>,
+        body: &UserPayload,
+    ) -> Result<UserProvisioningResponse, SdkError> {
+        let path_params = vec![("account_id", params.account_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&CREATE_ACCOUNT_USER_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner
+            .deserialize::<UserProvisioningResponse>(result.body)
     }
 
     /// Creates a new OIDC provider.
@@ -200,35 +229,6 @@ impl IamClient {
             .invoke(&CREATE_SIGNING_KEY_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<SigningKeyResponse>(result.body)
-    }
-
-    /// Creates a group for a tenant.
-    pub async fn create_tenant_group(
-        &self,
-        params: CreateTenantGroupPathParams<'_>,
-        body: &GroupPayload,
-    ) -> Result<GroupDto, SdkError> {
-        let path_params = vec![("tenant", params.tenant.to_string())];
-        let result = self
-            .inner
-            .invoke(&CREATE_TENANT_GROUP_SPEC, &path_params, Some(body), None)
-            .await?;
-        self.inner.deserialize::<GroupDto>(result.body)
-    }
-
-    /// Creates a user within a tenant.
-    pub async fn create_tenant_user(
-        &self,
-        params: CreateTenantUserPathParams<'_>,
-        body: &UserPayload,
-    ) -> Result<UserProvisioningResponse, SdkError> {
-        let path_params = vec![("tenant", params.tenant.to_string())];
-        let result = self
-            .inner
-            .invoke(&CREATE_TENANT_USER_SPEC, &path_params, Some(body), None)
-            .await?;
-        self.inner
-            .deserialize::<UserProvisioningResponse>(result.body)
     }
 
     /// Creates a new key for a user.
@@ -944,6 +944,7 @@ impl IamClient {
     ) -> Result<GroupRoleBindingResponse, SdkError> {
         let path_params = vec![
             ("group_id", params.group_id.to_string()),
+            ("tenant_id", params.tenant_id.to_string()),
             ("role_id", params.role_id.to_string()),
         ];
         let result = self
@@ -1019,7 +1020,7 @@ impl IamClient {
         body: &UserMfaRequirementPayload,
     ) -> Result<UserDto, SdkError> {
         let path_params = vec![
-            ("tenant", params.tenant.to_string()),
+            ("account_id", params.account_id.to_string()),
             ("user_id", params.user_id.to_string()),
         ];
         let result = self
@@ -1162,7 +1163,7 @@ pub struct AddGroupRolePathParams<'a> {
 
 #[derive(Clone, Debug)]
 pub struct AddUserToGroupPathParams<'a> {
-    pub tenant: &'a str,
+    pub account_id: &'a str,
     pub group_id: &'a str,
 }
 
@@ -1181,22 +1182,22 @@ pub struct AttachPolicyToPrincipalPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct CreateAccountGroupPathParams<'a> {
+    pub account_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct CreateAccountUserPathParams<'a> {
+    pub account_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct CreateServiceAccountKeyPathParams<'a> {
     pub service_account_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
 pub struct CreateSigningKeyPathParams<'a> {
-    pub tenant: &'a str,
-}
-
-#[derive(Clone, Debug)]
-pub struct CreateTenantGroupPathParams<'a> {
-    pub tenant: &'a str,
-}
-
-#[derive(Clone, Debug)]
-pub struct CreateTenantUserPathParams<'a> {
     pub tenant: &'a str,
 }
 
@@ -1398,6 +1399,7 @@ pub struct RemoveGroupMemberPathParams<'a> {
 #[derive(Clone, Debug)]
 pub struct RemoveGroupRolePathParams<'a> {
     pub group_id: &'a str,
+    pub tenant_id: &'a str,
     pub role_id: &'a str,
 }
 
@@ -1414,7 +1416,7 @@ pub struct RevokeUserSessionPathParams<'a> {
 
 #[derive(Clone, Debug)]
 pub struct SetUserMfaRequirementPathParams<'a> {
-    pub tenant: &'a str,
+    pub account_id: &'a str,
     pub user_id: &'a str,
 }
 
@@ -1473,7 +1475,7 @@ const ADD_GROUP_ROLE_SPEC: OperationSpec = OperationSpec {
 const ADD_USER_TO_GROUP_SPEC: OperationSpec = OperationSpec {
     name: "AddUserToGroup",
     method: SdkHttpMethod::Post,
-    uri: "/iam/tenants/{tenant}/groups/{group_id}/users",
+    uri: "/iam/accounts/{account_id}/groups/{group_id}/users",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
@@ -1507,6 +1509,28 @@ const ATTACH_POLICY_TO_PRINCIPAL_SPEC: OperationSpec = OperationSpec {
     name: "AttachPolicyToPrincipal",
     method: SdkHttpMethod::Post,
     uri: "/iam/tenants/{tenant}/principals/{type}/{id}/policies",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const CREATE_ACCOUNT_GROUP_SPEC: OperationSpec = OperationSpec {
+    name: "CreateAccountGroup",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/accounts/{account_id}/groups",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const CREATE_ACCOUNT_USER_SPEC: OperationSpec = OperationSpec {
+    name: "CreateAccountUser",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/accounts/{account_id}/users",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
@@ -1584,28 +1608,6 @@ const CREATE_SIGNING_KEY_SPEC: OperationSpec = OperationSpec {
     name: "CreateSigningKey",
     method: SdkHttpMethod::Post,
     uri: "/iam/tenants/{tenant}/signing-keys",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: true,
-    pagination: None,
-    lro: false,
-};
-
-const CREATE_TENANT_GROUP_SPEC: OperationSpec = OperationSpec {
-    name: "CreateTenantGroup",
-    method: SdkHttpMethod::Post,
-    uri: "/iam/tenants/{tenant}/groups",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: true,
-    pagination: None,
-    lro: false,
-};
-
-const CREATE_TENANT_USER_SPEC: OperationSpec = OperationSpec {
-    name: "CreateTenantUser",
-    method: SdkHttpMethod::Post,
-    uri: "/iam/tenants/{tenant}/users",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
@@ -2155,7 +2157,7 @@ const REMOVE_GROUP_MEMBER_SPEC: OperationSpec = OperationSpec {
 const REMOVE_GROUP_ROLE_SPEC: OperationSpec = OperationSpec {
     name: "RemoveGroupRole",
     method: SdkHttpMethod::Delete,
-    uri: "/iam/groups/{group_id}/roles/{role_id}",
+    uri: "/iam/groups/{group_id}/roles/{tenant_id}/{role_id}",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
@@ -2210,7 +2212,7 @@ const REVOKE_USER_SESSION_SPEC: OperationSpec = OperationSpec {
 const SET_USER_MFA_REQUIREMENT_SPEC: OperationSpec = OperationSpec {
     name: "SetUserMfaRequirement",
     method: SdkHttpMethod::Put,
-    uri: "/iam/tenants/{tenant}/users/{user_id}/mfa",
+    uri: "/iam/accounts/{account_id}/users/{user_id}/mfa",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
