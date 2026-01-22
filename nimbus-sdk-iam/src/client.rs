@@ -518,6 +518,16 @@ impl IamClient {
         self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
 
+    /// Evaluates policy decisions for an action and resource.
+    pub async fn evaluate(&self, body: &EvaluateRequest) -> Result<EvaluateResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&EVALUATE_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<EvaluateResponse>(result.body)
+    }
+
     /// Exports audit events for the current tenant.
     pub async fn export_audit_events(
         &self,
@@ -1806,6 +1816,17 @@ const ENABLE_USER_KEY_SPEC: OperationSpec = OperationSpec {
     name: "EnableUserKey",
     method: SdkHttpMethod::Post,
     uri: "/iam/users/{user_id}/keys/{key_id}/enable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const EVALUATE_SPEC: OperationSpec = OperationSpec {
+    name: "Evaluate",
+    method: SdkHttpMethod::Post,
+    uri: "/iam/evaluate",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
