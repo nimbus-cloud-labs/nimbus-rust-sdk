@@ -196,9 +196,9 @@ impl AuthTokenProvider for StaticKeyProvider {
 }
 
 fn validate_access_key(value: &str) -> Result<(), AuthError> {
-    if value.len() != 26 {
+    if value.len() != 26 && value.len() != 31 {
         return Err(AuthError::Message(
-            "access key must be exactly 26 characters".to_string(),
+            "access key must be exactly 26 or 31 characters".to_string(),
         ));
     }
     if !value

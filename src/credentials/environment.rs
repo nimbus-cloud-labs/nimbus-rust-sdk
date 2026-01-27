@@ -345,8 +345,8 @@ fn normalize_profile(value: &str) -> Result<String, AuthError> {
 }
 
 fn validate_access_key(value: &str) -> Result<(), &'static str> {
-    if value.len() != 26 {
-        return Err("value must be exactly 26 characters");
+    if value.len() != 26 && value.len() != 31 {
+        return Err("value must be exactly 26 or 31 characters");
     }
     if !value
         .chars()
