@@ -116,6 +116,18 @@ impl DamManagementClient {
         self.inner.deserialize::<AssetDownloadResponse>(result.body)
     }
 
+    pub async fn create_bucket(
+        &self,
+        body: &CreateBucketRequest,
+    ) -> Result<BucketRecord, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&CREATE_BUCKET_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<BucketRecord>(result.body)
+    }
+
     pub async fn create_collection(
         &self,
         body: &CreateCollectionRequest,
@@ -170,6 +182,18 @@ impl DamManagementClient {
         let result = self
             .inner
             .invoke(&DELETE_ASSET_PREFIX_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<Value>(result.body)
+    }
+
+    pub async fn delete_bucket(
+        &self,
+        params: DeleteBucketPathParams<'_>,
+    ) -> Result<Value, SdkError> {
+        let path_params = vec![("bucket_name", params.bucket_name.to_string())];
+        let result = self
+            .inner
+            .invoke(&DELETE_BUCKET_SPEC, &path_params, None, None)
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -286,6 +310,15 @@ impl DamManagementClient {
             .await?;
         self.inner
             .deserialize::<AssetRenditionListResponse>(result.body)
+    }
+
+    pub async fn list_buckets(&self) -> Result<BucketListResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&LIST_BUCKETS_SPEC, &path_params, None, None)
+            .await?;
+        self.inner.deserialize::<BucketListResponse>(result.body)
     }
 
     pub async fn list_collection_memberships(
@@ -579,6 +612,11 @@ pub struct DeleteAssetPrefixPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct DeleteBucketPathParams<'a> {
+    pub bucket_name: &'a str,
+}
+
+#[derive(Clone, Debug)]
 pub struct DeleteCollectionPathParams<'a> {
     pub collection_id: &'a str,
 }
@@ -748,6 +786,17 @@ const CREATE_ASSET_RENDITION_DOWNLOAD_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const CREATE_BUCKET_SPEC: OperationSpec = OperationSpec {
+    name: "CreateBucket",
+    method: SdkHttpMethod::Post,
+    uri: "/buckets",
+    success_code: 201,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
 const CREATE_COLLECTION_SPEC: OperationSpec = OperationSpec {
     name: "CreateCollection",
     method: SdkHttpMethod::Post,
@@ -796,6 +845,17 @@ const DELETE_ASSET_PREFIX_SPEC: OperationSpec = OperationSpec {
     name: "DeleteAssetPrefix",
     method: SdkHttpMethod::Delete,
     uri: "/assets/prefixes/{prefix_id}",
+    success_code: 204,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const DELETE_BUCKET_SPEC: OperationSpec = OperationSpec {
+    name: "DeleteBucket",
+    method: SdkHttpMethod::Delete,
+    uri: "/buckets/{bucket_name}",
     success_code: 204,
     additional_success_responses: &[],
     idempotent: false,
@@ -895,6 +955,17 @@ const LIST_ASSET_RENDITIONS_SPEC: OperationSpec = OperationSpec {
     name: "ListAssetRenditions",
     method: SdkHttpMethod::Get,
     uri: "/assets/{asset_id}/renditions",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: false,
+    pagination: None,
+    lro: false,
+};
+
+const LIST_BUCKETS_SPEC: OperationSpec = OperationSpec {
+    name: "ListBuckets",
+    method: SdkHttpMethod::Get,
+    uri: "/buckets",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,
