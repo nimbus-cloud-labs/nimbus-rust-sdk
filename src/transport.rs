@@ -70,6 +70,13 @@ impl ReqwestTransport {
             base_url: Arc::new(base_url),
         }
     }
+
+    pub fn new_with_client(base_url: Url, client: Client) -> Self {
+        Self {
+            client,
+            base_url: Arc::new(base_url),
+        }
+    }
 }
 
 #[async_trait]

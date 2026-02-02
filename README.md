@@ -62,6 +62,37 @@ let config = SdkConfigBuilder::default()
 ## Pagination and LRO
 Generated clients expose paginator helpers and `.wait()` for long-running operations. These follow Smithy traits and align across languages.
 
+## mTLS
+Use a custom `reqwest::Client` with client certificates and pass it through the SDK transport.
+
+```rust
+use std::sync::Arc;
+
+use nimbus_sdk_core::auth::StaticTokenProvider;
+use nimbus_sdk_core::client::SdkConfigBuilder;
+use nimbus_sdk_core::transport::ReqwestTransport;
+use reqwest::{Certificate, Client, Identity};
+use url::Url;
+
+let identity = Identity::from_pem(include_bytes!("/etc/nimbus/client.pem"))?;
+let ca = Certificate::from_pem(include_bytes!("/etc/nimbus/mtls-ca.pem"))?;
+let http = Client::builder()
+    .identity(identity)
+    .add_root_certificate(ca)
+    .use_rustls_tls()
+    .build()?;
+
+let transport = ReqwestTransport::new_with_client(
+    Url::parse("https://api.nimbuscloudplatform.eu")?,
+    http,
+);
+
+let config = SdkConfigBuilder::default()
+    .auth(Arc::new(StaticTokenProvider::bearer("token")))
+    .transport(Arc::new(transport))
+    .build()?;
+```
+
 ## Development
 - Regenerate SDK clients from Smithy models using the bundled generator.
 - Run `cargo fmt --all` and `cargo clippy --all-targets --all-features -- -D warnings` before submitting changes.
