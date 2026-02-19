@@ -97,6 +97,58 @@ impl KmsClient {
             .deserialize::<GenerateDataKeyResponse>(result.body)
     }
 
+    pub async fn disable_key(
+        &self,
+        params: DisableKeyPathParams<'_>,
+        body: &DisableKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&DISABLE_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
+    pub async fn enable_key(
+        &self,
+        params: EnableKeyPathParams<'_>,
+        body: &EnableKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&ENABLE_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
+    pub async fn rotate_key(
+        &self,
+        params: RotateKeyPathParams<'_>,
+        body: &RotateKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&ROTATE_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
+    pub async fn purge_key(
+        &self,
+        params: PurgeKeyPathParams<'_>,
+        body: &PurgeKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let result = self
+            .inner
+            .invoke(&PURGE_KEY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
     pub async fn schedule_key_deletion(
         &self,
         params: ScheduleKeyDeletionPathParams<'_>,
@@ -109,10 +161,48 @@ impl KmsClient {
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
+
+    pub async fn sign(&self, body: &SignRequest) -> Result<SignResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&SIGN_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<SignResponse>(result.body)
+    }
+
+    pub async fn verify(&self, body: &VerifyRequest) -> Result<VerifyResponse, SdkError> {
+        let path_params: Vec<(&'static str, String)> = Vec::new();
+        let result = self
+            .inner
+            .invoke(&VERIFY_SPEC, &path_params, Some(body), None)
+            .await?;
+        self.inner.deserialize::<VerifyResponse>(result.body)
+    }
 }
 
 #[derive(Clone, Debug)]
 pub struct CancelKeyDeletionPathParams<'a> {
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct DisableKeyPathParams<'a> {
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct EnableKeyPathParams<'a> {
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct RotateKeyPathParams<'a> {
+    pub key_id: &'a str,
+}
+
+#[derive(Clone, Debug)]
+pub struct PurgeKeyPathParams<'a> {
     pub key_id: &'a str,
 }
 
@@ -187,10 +277,76 @@ const GENERATE_DATA_KEY_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
+const DISABLE_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "DisableKey",
+    method: SdkHttpMethod::Post,
+    uri: "/keys/{key_id}/disable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const ENABLE_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "EnableKey",
+    method: SdkHttpMethod::Post,
+    uri: "/keys/{key_id}/enable",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const ROTATE_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "RotateKey",
+    method: SdkHttpMethod::Post,
+    uri: "/keys/{key_id}/rotate",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const PURGE_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "PurgeKey",
+    method: SdkHttpMethod::Post,
+    uri: "/keys/{key_id}/purge",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
 const SCHEDULE_KEY_DELETION_SPEC: OperationSpec = OperationSpec {
     name: "ScheduleKeyDeletion",
     method: SdkHttpMethod::Post,
     uri: "/keys/{key_id}/schedule-deletion",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const SIGN_SPEC: OperationSpec = OperationSpec {
+    name: "Sign",
+    method: SdkHttpMethod::Post,
+    uri: "/crypto/sign",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const VERIFY_SPEC: OperationSpec = OperationSpec {
+    name: "Verify",
+    method: SdkHttpMethod::Post,
+    uri: "/crypto/verify",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
