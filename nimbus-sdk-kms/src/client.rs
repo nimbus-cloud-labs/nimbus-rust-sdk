@@ -89,6 +89,34 @@ impl KmsClient {
             .deserialize::<DecryptDataKeyResponse>(result.body)
     }
 
+    pub async fn disable_key(
+        &self,
+        params: DisableKeyPathParams<'_>,
+        body: &DisableKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
+        let result = self
+            .inner
+            .invoke(&DISABLE_KEY_SPEC, &path_params, Some(&body_value), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
+    pub async fn enable_key(
+        &self,
+        params: EnableKeyPathParams<'_>,
+        body: &EnableKeyRequest,
+    ) -> Result<KeyMetadataResponse, SdkError> {
+        let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
+        let result = self
+            .inner
+            .invoke(&ENABLE_KEY_SPEC, &path_params, Some(&body_value), None)
+            .await?;
+        self.inner.deserialize::<KeyMetadataResponse>(result.body)
+    }
+
     pub async fn encrypt(&self, body: &EncryptRequest) -> Result<EncryptResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
         let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
@@ -118,30 +146,16 @@ impl KmsClient {
             .deserialize::<GenerateDataKeyResponse>(result.body)
     }
 
-    pub async fn disable_key(
+    pub async fn purge_key(
         &self,
-        params: DisableKeyPathParams<'_>,
-        body: &DisableKeyRequest,
+        params: PurgeKeyPathParams<'_>,
+        body: &PurgeKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
         let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DISABLE_KEY_SPEC, &path_params, Some(&body_value), None)
-            .await?;
-        self.inner.deserialize::<KeyMetadataResponse>(result.body)
-    }
-
-    pub async fn enable_key(
-        &self,
-        params: EnableKeyPathParams<'_>,
-        body: &EnableKeyRequest,
-    ) -> Result<KeyMetadataResponse, SdkError> {
-        let path_params = vec![("key_id", params.key_id.to_string())];
-        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
-        let result = self
-            .inner
-            .invoke(&ENABLE_KEY_SPEC, &path_params, Some(&body_value), None)
+            .invoke(&PURGE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -156,20 +170,6 @@ impl KmsClient {
         let result = self
             .inner
             .invoke(&ROTATE_KEY_SPEC, &path_params, Some(&body_value), None)
-            .await?;
-        self.inner.deserialize::<KeyMetadataResponse>(result.body)
-    }
-
-    pub async fn purge_key(
-        &self,
-        params: PurgeKeyPathParams<'_>,
-        body: &PurgeKeyRequest,
-    ) -> Result<KeyMetadataResponse, SdkError> {
-        let path_params = vec![("key_id", params.key_id.to_string())];
-        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
-        let result = self
-            .inner
-            .invoke(&PURGE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -230,12 +230,12 @@ pub struct EnableKeyPathParams<'a> {
 }
 
 #[derive(Clone, Debug)]
-pub struct RotateKeyPathParams<'a> {
+pub struct PurgeKeyPathParams<'a> {
     pub key_id: &'a str,
 }
 
 #[derive(Clone, Debug)]
-pub struct PurgeKeyPathParams<'a> {
+pub struct RotateKeyPathParams<'a> {
     pub key_id: &'a str,
 }
 
@@ -288,28 +288,6 @@ const DECRYPT_DATA_KEY_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
-const ENCRYPT_SPEC: OperationSpec = OperationSpec {
-    name: "Encrypt",
-    method: SdkHttpMethod::Post,
-    uri: "/crypto/encrypt",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: true,
-    pagination: None,
-    lro: false,
-};
-
-const GENERATE_DATA_KEY_SPEC: OperationSpec = OperationSpec {
-    name: "GenerateDataKey",
-    method: SdkHttpMethod::Post,
-    uri: "/crypto/generate-data-key",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: true,
-    pagination: None,
-    lro: false,
-};
-
 const DISABLE_KEY_SPEC: OperationSpec = OperationSpec {
     name: "DisableKey",
     method: SdkHttpMethod::Post,
@@ -332,10 +310,21 @@ const ENABLE_KEY_SPEC: OperationSpec = OperationSpec {
     lro: false,
 };
 
-const ROTATE_KEY_SPEC: OperationSpec = OperationSpec {
-    name: "RotateKey",
+const ENCRYPT_SPEC: OperationSpec = OperationSpec {
+    name: "Encrypt",
     method: SdkHttpMethod::Post,
-    uri: "/keys/{key_id}/rotate",
+    uri: "/crypto/encrypt",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const GENERATE_DATA_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "GenerateDataKey",
+    method: SdkHttpMethod::Post,
+    uri: "/crypto/generate-data-key",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
@@ -347,6 +336,17 @@ const PURGE_KEY_SPEC: OperationSpec = OperationSpec {
     name: "PurgeKey",
     method: SdkHttpMethod::Post,
     uri: "/keys/{key_id}/purge",
+    success_code: 200,
+    additional_success_responses: &[],
+    idempotent: true,
+    pagination: None,
+    lro: false,
+};
+
+const ROTATE_KEY_SPEC: OperationSpec = OperationSpec {
+    name: "RotateKey",
+    method: SdkHttpMethod::Post,
+    uri: "/keys/{key_id}/rotate",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: true,
