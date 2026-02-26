@@ -36,9 +36,10 @@ impl DamManagementClient {
         body: &LifecycleRequest,
     ) -> Result<LifecycleResponse, SdkError> {
         let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ARCHIVE_ASSET_SPEC, &path_params, Some(body), None)
+            .invoke(&ARCHIVE_ASSET_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<LifecycleResponse>(result.body)
     }
@@ -48,9 +49,15 @@ impl DamManagementClient {
         body: &IngestionRequest,
     ) -> Result<IngestionResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&BEGIN_ASSET_INGESTION_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &BEGIN_ASSET_INGESTION_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<IngestionResponse>(result.body)
     }
@@ -60,12 +67,13 @@ impl DamManagementClient {
         body: &CompleteIngestionRequest,
     ) -> Result<OperationResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &COMPLETE_ASSET_INGESTION_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -89,9 +97,15 @@ impl DamManagementClient {
         body: &CreateAssetPrefixRequest,
     ) -> Result<AssetPrefixResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_ASSET_PREFIX_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_ASSET_PREFIX_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<AssetPrefixResponse>(result.body)
     }
@@ -121,9 +135,10 @@ impl DamManagementClient {
         body: &CreateBucketRequest,
     ) -> Result<BucketRecord, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_BUCKET_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_BUCKET_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<BucketRecord>(result.body)
     }
@@ -133,9 +148,15 @@ impl DamManagementClient {
         body: &CreateCollectionRequest,
     ) -> Result<CollectionResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_COLLECTION_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_COLLECTION_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<CollectionResponse>(result.body)
     }
@@ -145,9 +166,10 @@ impl DamManagementClient {
         body: &CreatePipelineRequest,
     ) -> Result<PipelineRecordResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_PIPELINE_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_PIPELINE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner
             .deserialize::<PipelineRecordResponse>(result.body)
@@ -158,9 +180,15 @@ impl DamManagementClient {
         body: &CreateSmartAlbumRequest,
     ) -> Result<SmartAlbumResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_SMART_ALBUM_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_SMART_ALBUM_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<SmartAlbumResponse>(result.body)
     }
@@ -369,9 +397,15 @@ impl DamManagementClient {
         body: &ProcessorCallbackPayload,
     ) -> Result<Value, SdkError> {
         let path_params = vec![("token", params.token.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&OPERATION_CALLBACK_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &OPERATION_CALLBACK_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -382,9 +416,10 @@ impl DamManagementClient {
         body: &LifecycleRequest,
     ) -> Result<LifecycleResponse, SdkError> {
         let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&PUBLISH_ASSET_SPEC, &path_params, Some(body), None)
+            .invoke(&PUBLISH_ASSET_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<LifecycleResponse>(result.body)
     }
@@ -395,12 +430,13 @@ impl DamManagementClient {
         body: &CollectionMembershipChangeRequest,
     ) -> Result<CollectionMembershipListResponse, SdkError> {
         let path_params = vec![("collection_id", params.collection_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &PUT_COLLECTION_MEMBERSHIPS_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -413,9 +449,15 @@ impl DamManagementClient {
         body: &IndexSnapshotRequest,
     ) -> Result<IndexSnapshotResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&RECORD_INDEX_SNAPSHOT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &RECORD_INDEX_SNAPSHOT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<IndexSnapshotResponse>(result.body)
     }
@@ -440,9 +482,10 @@ impl DamManagementClient {
         body: &PipelineRerunRequest,
     ) -> Result<PipelineRerunResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&RERUN_PIPELINES_SPEC, &path_params, Some(body), None)
+            .invoke(&RERUN_PIPELINES_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<PipelineRerunResponse>(result.body)
     }
@@ -453,9 +496,10 @@ impl DamManagementClient {
         body: &LifecycleRequest,
     ) -> Result<LifecycleResponse, SdkError> {
         let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&RESTORE_ASSET_SPEC, &path_params, Some(body), None)
+            .invoke(&RESTORE_ASSET_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<LifecycleResponse>(result.body)
     }
@@ -477,9 +521,10 @@ impl DamManagementClient {
         body: &AssetSearchRequest,
     ) -> Result<AssetSearchResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&SEARCH_ASSETS_SPEC, &path_params, Some(body), None)
+            .invoke(&SEARCH_ASSETS_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<AssetSearchResponse>(result.body)
     }
@@ -489,12 +534,13 @@ impl DamManagementClient {
         body: &AssetSearchRequest,
     ) -> Result<AssetSearchResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &SEARCH_ASSETS_WITH_BODY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -507,12 +553,13 @@ impl DamManagementClient {
         body: &CustomMetadataRequest,
     ) -> Result<Value, SdkError> {
         let path_params = vec![("asset_id", params.asset_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &UPDATE_ASSET_CUSTOM_METADATA_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -528,12 +575,13 @@ impl DamManagementClient {
             ("asset_id", params.asset_id.to_string()),
             ("version_id", params.version_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &UPDATE_ASSET_VERSION_CUSTOM_METADATA_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -546,9 +594,15 @@ impl DamManagementClient {
         body: &UpdateCollectionRequest,
     ) -> Result<CollectionResponse, SdkError> {
         let path_params = vec![("collection_id", params.collection_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_COLLECTION_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &UPDATE_COLLECTION_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<CollectionResponse>(result.body)
     }
@@ -559,9 +613,10 @@ impl DamManagementClient {
         body: &UpdatePipelineRequest,
     ) -> Result<PipelineRecordResponse, SdkError> {
         let path_params = vec![("pipeline_id", params.pipeline_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_PIPELINE_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_PIPELINE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner
             .deserialize::<PipelineRecordResponse>(result.body)
@@ -573,9 +628,15 @@ impl DamManagementClient {
         body: &UpdateSmartAlbumRequest,
     ) -> Result<SmartAlbumResponse, SdkError> {
         let path_params = vec![("album_id", params.album_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_SMART_ALBUM_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &UPDATE_SMART_ALBUM_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<SmartAlbumResponse>(result.body)
     }

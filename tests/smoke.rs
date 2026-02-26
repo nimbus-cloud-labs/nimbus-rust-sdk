@@ -10,7 +10,7 @@ use nimbus_sdk_core::{
     lro::{OperationHandle, OperationStatus, OperationStatusClient},
     transport::{Transport, TransportError, TransportRequest, TransportResponse},
 };
-use nimbus_sdk_iam::IamClient;
+use nimbus_sdk_iam::{IamClient, TokenRequest};
 use serde_json::json;
 use tokio::time::Duration;
 use uuid::Uuid;
@@ -30,10 +30,16 @@ async fn emits_token_via_generated_client() {
     let iam = IamClient::new(client);
 
     let response = iam
-        .emit_token(&json!({ "urn": "urn:nimbus:iam::123", "typ": "access" }))
+        .emit_token(&TokenRequest {
+            urn: "urn:nimbus:iam::123".to_string(),
+            typ: "access".to_string(),
+            scope: None,
+            aud: None,
+            ttl_secs: None,
+        })
         .await
         .unwrap();
-    assert_eq!(response["token"], "demo");
+    assert_eq!(response.token, "demo");
 }
 
 #[tokio::test]

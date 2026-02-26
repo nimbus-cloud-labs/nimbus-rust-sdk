@@ -3,11 +3,13 @@ use std::{convert::TryFrom, io};
 use bytes::Bytes;
 use nimbus_sdk_core::{transport::TransportError, SdkError};
 use reqwest::Client;
-use serde::Deserialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
-use crate::{client::DamManagementClient, types::OperationResponse};
+use crate::{
+    client::DamManagementClient,
+    types::{CompleteIngestionRequest, IngestionRequest, OperationResponse},
+};
 
 /// Parameters describing an ingestion request.
 #[derive(Debug, Clone)]
@@ -65,17 +67,18 @@ impl DamIngestionUploader {
         let size_bytes = i64::try_from(content.len())
             .map_err(|_| payload_error("payload size exceeds supported range"))?;
         let checksum = hex::encode(Sha256::digest(&content));
-        let ingestion_request = json!({
-            "display_name": params.display_name,
-            "media_type": params.media_type,
-            "content_length": size_bytes,
-            "checksum_algorithm": "sha256",
-            "checksum": checksum,
-            "metadata": metadata,
-        });
+        let ingestion_request = IngestionRequest {
+            display_name: params.display_name,
+            media_type: params.media_type.clone(),
+            content_length: size_bytes,
+            checksum_algorithm: "sha256".to_string(),
+            checksum: checksum.clone(),
+            metadata,
+            path_prefix: None,
+            bucket_name: None,
+        };
 
-        let begin_value = self.api.begin_asset_ingestion(&ingestion_request).await?;
-        let begin_response: BeginResponse = serde_json::from_value(begin_value.clone())?;
+        let begin_response = self.api.begin_asset_ingestion(&ingestion_request).await?;
         self.put_object(
             &begin_response.upload.upload_url,
             &begin_response.upload.upload_token,
@@ -84,12 +87,12 @@ impl DamIngestionUploader {
         )
         .await?;
 
-        let complete_request = json!({
-            "upload_token": begin_response.upload.upload_token,
-            "checksum_algorithm": "sha256",
-            "checksum": checksum,
-            "size_bytes": size_bytes,
-        });
+        let complete_request = CompleteIngestionRequest {
+            upload_token: begin_response.upload.upload_token,
+            checksum_algorithm: "sha256".to_string(),
+            checksum,
+            size_bytes,
+        };
 
         self.api.complete_asset_ingestion(&complete_request).await
     }
@@ -120,17 +123,6 @@ impl DamIngestionUploader {
 
         Ok(())
     }
-}
-
-#[derive(Debug, Deserialize)]
-struct BeginResponse {
-    upload: UploadTicketPayload,
-}
-
-#[derive(Debug, Deserialize)]
-struct UploadTicketPayload {
-    upload_url: String,
-    upload_token: String,
 }
 
 fn payload_error(message: &str) -> SdkError {

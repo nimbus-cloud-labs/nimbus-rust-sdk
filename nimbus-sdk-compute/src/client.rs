@@ -39,9 +39,15 @@ impl ComputeClient {
         body: &InterfacePayload,
     ) -> Result<OperationHandle, SdkError> {
         let path_params = vec![("switch", params.switch.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ATTACH_INTERFACE_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &ATTACH_INTERFACE_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
@@ -52,12 +58,13 @@ impl ComputeClient {
         body: &BootstrapCredentialsBody,
     ) -> Result<BootstrapCredentialsResponse, SdkError> {
         let path_params = vec![("host_id", params.host_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &BOOTSTRAP_AGENT_CREDENTIALS_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -97,36 +104,40 @@ impl ComputeClient {
         body: &CreateNetworkPayload,
     ) -> Result<OperationHandle, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_NETWORK_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_NETWORK_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
 
     pub async fn create_nic(&self, body: &CreateNicPayload) -> Result<OperationHandle, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_NIC_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_NIC_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
 
     pub async fn create_switch(&self, body: &SwitchPayload) -> Result<OperationHandle, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_SWITCH_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_SWITCH_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
 
     pub async fn create_vm(&self, body: &CreateVmPayload) -> Result<OperationHandle, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_VM_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_VM_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
@@ -149,9 +160,15 @@ impl ComputeClient {
         body: &InterfacePayload,
     ) -> Result<OperationHandle, SdkError> {
         let path_params = vec![("switch", params.switch.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DETACH_INTERFACE_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &DETACH_INTERFACE_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
@@ -165,9 +182,10 @@ impl ComputeClient {
             ("host_id", params.host_id.to_string()),
             ("job_id", params.job_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&FAIL_AGENT_JOB_SPEC, &path_params, Some(body), None)
+            .invoke(&FAIL_AGENT_JOB_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -198,9 +216,10 @@ impl ComputeClient {
 
     pub async fn heartbeat(&self, body: &HeartbeatPayload) -> Result<Value, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&HEARTBEAT_SPEC, &path_params, Some(body), None)
+            .invoke(&HEARTBEAT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -248,9 +267,10 @@ impl ComputeClient {
         body: &BootLookupPayload,
     ) -> Result<BootLookupResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LOOKUP_PXE_BOOT_SPEC, &path_params, Some(body), None)
+            .invoke(&LOOKUP_PXE_BOOT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<BootLookupResponse>(result.body)
     }
@@ -261,9 +281,10 @@ impl ComputeClient {
         body: &VmMigrationRequestPayload,
     ) -> Result<OperationHandle, SdkError> {
         let path_params = vec![("id", params.id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&MIGRATE_VM_SPEC, &path_params, Some(body), None)
+            .invoke(&MIGRATE_VM_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
@@ -274,9 +295,15 @@ impl ComputeClient {
         body: &HeartbeatPayload,
     ) -> Result<Value, SdkError> {
         let path_params = vec![("host_id", params.host_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&REPORT_AGENT_STATUS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &REPORT_AGENT_STATUS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -287,12 +314,13 @@ impl ComputeClient {
         body: &RotateAgentCredentialsRequest,
     ) -> Result<Value, SdkError> {
         let path_params = vec![("host_id", params.host_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &ROTATE_AGENT_CREDENTIALS_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -338,9 +366,10 @@ impl ComputeClient {
         body: &UpdateNetworkPayload,
     ) -> Result<OperationHandle, SdkError> {
         let path_params = vec![("network_id", params.network_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_NETWORK_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_NETWORK_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<OperationHandle>(result.body)
     }
@@ -351,12 +380,13 @@ impl ComputeClient {
         body: &BootRegistryUpsertPayload,
     ) -> Result<BootRegistryEntry, SdkError> {
         let path_params = vec![("mac", params.mac.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &UPSERT_BOOT_REGISTRY_ENTRY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;

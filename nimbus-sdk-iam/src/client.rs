@@ -37,9 +37,10 @@ impl IamClient {
         body: &GroupRoleBindingPayload,
     ) -> Result<GroupRoleBindingResponse, SdkError> {
         let path_params = vec![("group_id", params.group_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ADD_GROUP_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&ADD_GROUP_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner
             .deserialize::<GroupRoleBindingResponse>(result.body)
@@ -55,9 +56,15 @@ impl IamClient {
             ("account_id", params.account_id.to_string()),
             ("group_id", params.group_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ADD_USER_TO_GROUP_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &ADD_USER_TO_GROUP_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<GroupMembershipDto>(result.body)
     }
@@ -65,9 +72,10 @@ impl IamClient {
     /// Assumes a role and returns temporary session credentials.
     pub async fn assume_role(&self, body: &AssumeRoleRequest) -> Result<Principal, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ASSUME_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&ASSUME_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Principal>(result.body)
     }
@@ -83,9 +91,15 @@ impl IamClient {
             ("type", params.r#type.to_string()),
             ("id", params.id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ATTACH_MANAGED_POLICY_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &ATTACH_MANAGED_POLICY_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<ManagedPolicyResponse>(result.body)
     }
@@ -101,12 +115,13 @@ impl IamClient {
             ("type", params.r#type.to_string()),
             ("id", params.id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &ATTACH_POLICY_TO_PRINCIPAL_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -120,9 +135,15 @@ impl IamClient {
         body: &GroupPayload,
     ) -> Result<GroupDto, SdkError> {
         let path_params = vec![("account_id", params.account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_ACCOUNT_GROUP_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_ACCOUNT_GROUP_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<GroupDto>(result.body)
     }
@@ -134,9 +155,15 @@ impl IamClient {
         body: &UserPayload,
     ) -> Result<UserProvisioningResponse, SdkError> {
         let path_params = vec![("account_id", params.account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_ACCOUNT_USER_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_ACCOUNT_USER_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<UserProvisioningResponse>(result.body)
@@ -148,9 +175,15 @@ impl IamClient {
         body: &OidcProviderPayload,
     ) -> Result<OidcProviderResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_OIDC_PROVIDER_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_OIDC_PROVIDER_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<OidcProviderResponse>(result.body)
     }
@@ -158,9 +191,10 @@ impl IamClient {
     /// Creates a new policy within the caller's tenant.
     pub async fn create_policy(&self, body: &CreatePolicy) -> Result<Policy, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_POLICY_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_POLICY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Policy>(result.body)
     }
@@ -168,9 +202,15 @@ impl IamClient {
     /// Creates a new IAM principal.
     pub async fn create_principal(&self, body: &Principal) -> Result<Principal, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_PRINCIPAL_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_PRINCIPAL_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<Principal>(result.body)
     }
@@ -178,9 +218,10 @@ impl IamClient {
     /// Creates a new role.
     pub async fn create_role(&self, body: &RolePayload) -> Result<RoleResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RoleResponse>(result.body)
     }
@@ -191,9 +232,15 @@ impl IamClient {
         body: &ServiceAccountPayload,
     ) -> Result<ServiceAccountResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_SERVICE_ACCOUNT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CREATE_SERVICE_ACCOUNT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<ServiceAccountResponse>(result.body)
@@ -206,12 +253,13 @@ impl IamClient {
         body: &ServiceAccountQuery,
     ) -> Result<ApiKeyResponse, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &CREATE_SERVICE_ACCOUNT_KEY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -238,9 +286,10 @@ impl IamClient {
         body: &UserKeyQuery,
     ) -> Result<ApiKeyResponse, SdkError> {
         let path_params = vec![("user_id", params.user_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_USER_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ApiKeyResponse>(result.body)
     }
@@ -294,9 +343,10 @@ impl IamClient {
         body: &RoleQuery,
     ) -> Result<RoleResponse, SdkError> {
         let path_params = vec![("role_id", params.role_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DELETE_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&DELETE_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RoleResponse>(result.body)
     }
@@ -308,9 +358,15 @@ impl IamClient {
         body: &ServiceAccountQuery,
     ) -> Result<ServiceAccountResponse, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DELETE_SERVICE_ACCOUNT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &DELETE_SERVICE_ACCOUNT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<ServiceAccountResponse>(result.body)
@@ -326,12 +382,13 @@ impl IamClient {
             ("service_account_id", params.service_account_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &DELETE_SERVICE_ACCOUNT_KEY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -361,9 +418,10 @@ impl IamClient {
             ("user_id", params.user_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DELETE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&DELETE_USER_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
@@ -414,12 +472,13 @@ impl IamClient {
             ("service_account_id", params.service_account_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &DISABLE_SERVICE_ACCOUNT_KEY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -449,9 +508,15 @@ impl IamClient {
             ("user_id", params.user_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DISABLE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &DISABLE_USER_KEY_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
@@ -459,9 +524,10 @@ impl IamClient {
     /// Issues a signed token for the requested principal.
     pub async fn emit_token(&self, body: &TokenRequest) -> Result<TokenResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&EMIT_TOKEN_SPEC, &path_params, Some(body), None)
+            .invoke(&EMIT_TOKEN_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<TokenResponse>(result.body)
     }
@@ -476,12 +542,13 @@ impl IamClient {
             ("service_account_id", params.service_account_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &ENABLE_SERVICE_ACCOUNT_KEY_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -511,9 +578,10 @@ impl IamClient {
             ("user_id", params.user_id.to_string()),
             ("key_id", params.key_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ENABLE_USER_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&ENABLE_USER_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ApiKeyMetadata>(result.body)
     }
@@ -521,9 +589,10 @@ impl IamClient {
     /// Evaluates policy decisions for an action and resource.
     pub async fn evaluate(&self, body: &EvaluateRequest) -> Result<EvaluateResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&EVALUATE_SPEC, &path_params, Some(body), None)
+            .invoke(&EVALUATE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<EvaluateResponse>(result.body)
     }
@@ -534,9 +603,15 @@ impl IamClient {
         body: &AuditExportQuery,
     ) -> Result<AuditExportJobResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&EXPORT_AUDIT_EVENTS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &EXPORT_AUDIT_EVENTS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<AuditExportJobResponse>(result.body)
@@ -631,9 +706,10 @@ impl IamClient {
         body: &RoleQuery,
     ) -> Result<RoleResponse, SdkError> {
         let path_params = vec![("role_id", params.role_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&GET_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&GET_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RoleResponse>(result.body)
     }
@@ -645,9 +721,15 @@ impl IamClient {
         body: &ServiceAccountQuery,
     ) -> Result<ServiceAccountResponse, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&GET_SERVICE_ACCOUNT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &GET_SERVICE_ACCOUNT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<ServiceAccountResponse>(result.body)
@@ -679,9 +761,10 @@ impl IamClient {
     /// Invites a new user to the account.
     pub async fn invite_user(&self, body: &UserInvitePayload) -> Result<UserResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&INVITE_USER_SPEC, &path_params, Some(body), None)
+            .invoke(&INVITE_USER_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<UserResponse>(result.body)
     }
@@ -692,9 +775,15 @@ impl IamClient {
         body: &AuditEventQuery,
     ) -> Result<AuditEventListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_AUDIT_EVENTS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &LIST_AUDIT_EVENTS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<AuditEventListResponse>(result.body)
@@ -755,9 +844,15 @@ impl IamClient {
         body: &OidcProviderQuery,
     ) -> Result<OidcProviderListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_OIDC_PROVIDERS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &LIST_OIDC_PROVIDERS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<OidcProviderListResponse>(result.body)
@@ -769,9 +864,10 @@ impl IamClient {
         body: &PolicyListQuery,
     ) -> Result<PolicyListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_POLICIES_SPEC, &path_params, Some(body), None)
+            .invoke(&LIST_POLICIES_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<PolicyListResponse>(result.body)
     }
@@ -819,9 +915,10 @@ impl IamClient {
     /// Lists roles for the account.
     pub async fn list_roles(&self, body: &RoleQuery) -> Result<RoleListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_ROLES_SPEC, &path_params, Some(body), None)
+            .invoke(&LIST_ROLES_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RoleListResponse>(result.body)
     }
@@ -833,12 +930,13 @@ impl IamClient {
         body: &ServiceAccountQuery,
     ) -> Result<ApiKeyListResponse, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &LIST_SERVICE_ACCOUNT_KEYS_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -851,9 +949,15 @@ impl IamClient {
         body: &ServiceAccountQuery,
     ) -> Result<ServiceAccountListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_SERVICE_ACCOUNTS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &LIST_SERVICE_ACCOUNTS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<ServiceAccountListResponse>(result.body)
@@ -865,9 +969,10 @@ impl IamClient {
         body: &SessionListQuery,
     ) -> Result<SessionListResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_SESSIONS_SPEC, &path_params, Some(body), None)
+            .invoke(&LIST_SESSIONS_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<SessionListResponse>(result.body)
     }
@@ -889,9 +994,10 @@ impl IamClient {
         body: &UserKeyQuery,
     ) -> Result<ApiKeyListResponse, SdkError> {
         let path_params = vec![("user_id", params.user_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&LIST_USER_KEYS_SPEC, &path_params, Some(body), None)
+            .invoke(&LIST_USER_KEYS_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ApiKeyListResponse>(result.body)
     }
@@ -923,9 +1029,15 @@ impl IamClient {
     /// Accepts an audit event payload for storage.
     pub async fn publish_audit_event(&self, body: &AuditEventEnvelope) -> Result<Value, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&PUBLISH_AUDIT_EVENT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &PUBLISH_AUDIT_EVENT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -971,9 +1083,15 @@ impl IamClient {
         body: &SessionRevokeAllPayload,
     ) -> Result<Value, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&REVOKE_ALL_SESSIONS_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &REVOKE_ALL_SESSIONS_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -985,12 +1103,13 @@ impl IamClient {
         body: &ServiceAccountTokenRevokePayload,
     ) -> Result<Value, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &REVOKE_SERVICE_ACCOUNT_TOKEN_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -1000,9 +1119,10 @@ impl IamClient {
     /// Revokes specific sessions.
     pub async fn revoke_sessions(&self, body: &SessionRevokePayload) -> Result<Value, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&REVOKE_SESSIONS_SPEC, &path_params, Some(body), None)
+            .invoke(&REVOKE_SESSIONS_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Value>(result.body)
     }
@@ -1033,12 +1153,13 @@ impl IamClient {
             ("account_id", params.account_id.to_string()),
             ("user_id", params.user_id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
             .invoke(
                 &SET_USER_MFA_REQUIREMENT_SPEC,
                 &path_params,
-                Some(body),
+                Some(&body_value),
                 None,
             )
             .await?;
@@ -1052,9 +1173,10 @@ impl IamClient {
         body: &TenantSuspendPayload,
     ) -> Result<TenantResponse, SdkError> {
         let path_params = vec![("tenant_id", params.tenant_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&SUSPEND_TENANT_SPEC, &path_params, Some(body), None)
+            .invoke(&SUSPEND_TENANT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<TenantResponse>(result.body)
     }
@@ -1066,9 +1188,10 @@ impl IamClient {
         body: &GroupUpdatePayload,
     ) -> Result<GroupResponse, SdkError> {
         let path_params = vec![("group_id", params.group_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_GROUP_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_GROUP_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<GroupResponse>(result.body)
     }
@@ -1080,9 +1203,15 @@ impl IamClient {
         body: &OidcProviderUpdatePayload,
     ) -> Result<OidcProviderResponse, SdkError> {
         let path_params = vec![("provider_id", params.provider_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_OIDC_PROVIDER_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &UPDATE_OIDC_PROVIDER_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<OidcProviderResponse>(result.body)
     }
@@ -1097,9 +1226,10 @@ impl IamClient {
             ("tenant", params.tenant.to_string()),
             ("id", params.id.to_string()),
         ];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_POLICY_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_POLICY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<Policy>(result.body)
     }
@@ -1111,9 +1241,10 @@ impl IamClient {
         body: &RoleUpdatePayload,
     ) -> Result<RoleResponse, SdkError> {
         let path_params = vec![("role_id", params.role_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_ROLE_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_ROLE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RoleResponse>(result.body)
     }
@@ -1125,9 +1256,15 @@ impl IamClient {
         body: &ServiceAccountUpdatePayload,
     ) -> Result<ServiceAccountResponse, SdkError> {
         let path_params = vec![("service_account_id", params.service_account_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_SERVICE_ACCOUNT_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &UPDATE_SERVICE_ACCOUNT_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<ServiceAccountResponse>(result.body)
@@ -1140,9 +1277,10 @@ impl IamClient {
         body: &TenantUpdatePayload,
     ) -> Result<TenantResponse, SdkError> {
         let path_params = vec![("tenant_id", params.tenant_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_TENANT_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_TENANT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<TenantResponse>(result.body)
     }
@@ -1154,9 +1292,10 @@ impl IamClient {
         body: &UserUpdatePayload,
     ) -> Result<UserResponse, SdkError> {
         let path_params = vec![("user_id", params.user_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_USER_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_USER_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<UserResponse>(result.body)
     }

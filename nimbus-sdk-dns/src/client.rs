@@ -39,18 +39,20 @@ impl DnsClient {
         body: &CreateRecordRequest,
     ) -> Result<RecordResponse, SdkError> {
         let path_params = vec![("zone_id", params.zone_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_RECORD_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_RECORD_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RecordResponse>(result.body)
     }
 
     pub async fn create_zone(&self, body: &CreateZoneRequest) -> Result<ZoneResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_ZONE_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_ZONE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ZoneResponse>(result.body)
     }
@@ -61,9 +63,10 @@ impl DnsClient {
         body: &DeleteRecordQuery,
     ) -> Result<RecordResponse, SdkError> {
         let path_params = vec![("record_id", params.record_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DELETE_RECORD_SPEC, &path_params, Some(body), None)
+            .invoke(&DELETE_RECORD_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RecordResponse>(result.body)
     }
@@ -74,9 +77,10 @@ impl DnsClient {
         body: &DeleteZoneQuery,
     ) -> Result<ZoneResponse, SdkError> {
         let path_params = vec![("zone_id", params.zone_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DELETE_ZONE_SPEC, &path_params, Some(body), None)
+            .invoke(&DELETE_ZONE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ZoneResponse>(result.body)
     }
@@ -195,9 +199,10 @@ impl DnsClient {
         body: &UpdateRecordRequest,
     ) -> Result<RecordResponse, SdkError> {
         let path_params = vec![("record_id", params.record_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_RECORD_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_RECORD_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<RecordResponse>(result.body)
     }
@@ -208,9 +213,10 @@ impl DnsClient {
         body: &UpdateZoneRequest,
     ) -> Result<ZoneResponse, SdkError> {
         let path_params = vec![("zone_id", params.zone_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&UPDATE_ZONE_SPEC, &path_params, Some(body), None)
+            .invoke(&UPDATE_ZONE_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<ZoneResponse>(result.body)
     }

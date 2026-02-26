@@ -34,9 +34,15 @@ impl KmsClient {
         body: &CancelKeyDeletionRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CANCEL_KEY_DELETION_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &CANCEL_KEY_DELETION_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -46,18 +52,20 @@ impl KmsClient {
         body: &CreateKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&CREATE_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&CREATE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
 
     pub async fn decrypt(&self, body: &DecryptRequest) -> Result<DecryptResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DECRYPT_SPEC, &path_params, Some(body), None)
+            .invoke(&DECRYPT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<DecryptResponse>(result.body)
     }
@@ -67,9 +75,15 @@ impl KmsClient {
         body: &DecryptDataKeyRequest,
     ) -> Result<DecryptDataKeyResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DECRYPT_DATA_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &DECRYPT_DATA_KEY_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<DecryptDataKeyResponse>(result.body)
@@ -77,9 +91,10 @@ impl KmsClient {
 
     pub async fn encrypt(&self, body: &EncryptRequest) -> Result<EncryptResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ENCRYPT_SPEC, &path_params, Some(body), None)
+            .invoke(&ENCRYPT_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<EncryptResponse>(result.body)
     }
@@ -89,9 +104,15 @@ impl KmsClient {
         body: &GenerateDataKeyRequest,
     ) -> Result<GenerateDataKeyResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&GENERATE_DATA_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &GENERATE_DATA_KEY_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner
             .deserialize::<GenerateDataKeyResponse>(result.body)
@@ -103,9 +124,10 @@ impl KmsClient {
         body: &DisableKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&DISABLE_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&DISABLE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -116,9 +138,10 @@ impl KmsClient {
         body: &EnableKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ENABLE_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&ENABLE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -129,9 +152,10 @@ impl KmsClient {
         body: &RotateKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&ROTATE_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&ROTATE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -142,9 +166,10 @@ impl KmsClient {
         body: &PurgeKeyRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&PURGE_KEY_SPEC, &path_params, Some(body), None)
+            .invoke(&PURGE_KEY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
@@ -155,27 +180,35 @@ impl KmsClient {
         body: &ScheduleKeyDeletionRequest,
     ) -> Result<KeyMetadataResponse, SdkError> {
         let path_params = vec![("key_id", params.key_id.to_string())];
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&SCHEDULE_KEY_DELETION_SPEC, &path_params, Some(body), None)
+            .invoke(
+                &SCHEDULE_KEY_DELETION_SPEC,
+                &path_params,
+                Some(&body_value),
+                None,
+            )
             .await?;
         self.inner.deserialize::<KeyMetadataResponse>(result.body)
     }
 
     pub async fn sign(&self, body: &SignRequest) -> Result<SignResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&SIGN_SPEC, &path_params, Some(body), None)
+            .invoke(&SIGN_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<SignResponse>(result.body)
     }
 
     pub async fn verify(&self, body: &VerifyRequest) -> Result<VerifyResponse, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
+        let body_value = serde_json::to_value(body).map_err(SdkError::Json)?;
         let result = self
             .inner
-            .invoke(&VERIFY_SPEC, &path_params, Some(body), None)
+            .invoke(&VERIFY_SPEC, &path_params, Some(&body_value), None)
             .await?;
         self.inner.deserialize::<VerifyResponse>(result.body)
     }
