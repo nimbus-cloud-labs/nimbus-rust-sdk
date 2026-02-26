@@ -224,16 +224,6 @@ impl ComputeClient {
         self.inner.deserialize::<Value>(result.body)
     }
 
-    pub async fn list_idempotency_records(&self) -> Result<IdempotencyListResponse, SdkError> {
-        let path_params: Vec<(&'static str, String)> = Vec::new();
-        let result = self
-            .inner
-            .invoke(&LIST_IDEMPOTENCY_RECORDS_SPEC, &path_params, None, None)
-            .await?;
-        self.inner
-            .deserialize::<IdempotencyListResponse>(result.body)
-    }
-
     pub async fn list_networks(&self) -> Result<Value, SdkError> {
         let path_params: Vec<(&'static str, String)> = Vec::new();
         let result = self
@@ -631,17 +621,6 @@ const HEARTBEAT_SPEC: OperationSpec = OperationSpec {
     name: "Heartbeat",
     method: SdkHttpMethod::Post,
     uri: "/heartbeat",
-    success_code: 200,
-    additional_success_responses: &[],
-    idempotent: false,
-    pagination: None,
-    lro: false,
-};
-
-const LIST_IDEMPOTENCY_RECORDS_SPEC: OperationSpec = OperationSpec {
-    name: "ListIdempotencyRecords",
-    method: SdkHttpMethod::Get,
-    uri: "/internal/idempotency",
     success_code: 200,
     additional_success_responses: &[],
     idempotent: false,

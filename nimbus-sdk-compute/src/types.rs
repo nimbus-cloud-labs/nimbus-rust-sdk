@@ -238,39 +238,6 @@ pub struct HostShutdownResponse {
 pub type HostShutdownResponseStopJobIdsList = Vec<String>;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct IdempotencyListResponse {
-    pub records: IdempotencyListResponseRecordsList,
-}
-
-pub type IdempotencyListResponseRecordsList = Vec<IdempotencyRecord>;
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct IdempotencyRecord {
-    #[serde(rename = "principalUrn")]
-    pub principal_urn: String,
-    #[serde(rename = "endpointScope")]
-    pub endpoint_scope: String,
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
-    #[serde(rename = "canonicalHash")]
-    pub canonical_hash: String,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        rename = "responseStatus"
-    )]
-    pub response_status: Option<i32>,
-    #[serde(default, skip_serializing_if = "Option::is_none", rename = "jobId")]
-    pub job_id: Option<String>,
-    #[serde(rename = "createdAt")]
-    pub created_at: String,
-    #[serde(rename = "lastSeenAt")]
-    pub last_seen_at: String,
-    #[serde(rename = "expiresAt")]
-    pub expires_at: String,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InterfacePayload {
     pub iface: String,
     #[serde(rename = "hostId")]
